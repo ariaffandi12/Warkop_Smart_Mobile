@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/sales_provider.dart';
+import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 
 class CartScreen extends StatelessWidget {
@@ -176,6 +177,12 @@ class CartScreen extends StatelessWidget {
                                     userId!,
                                   );
                                   if (success && context.mounted) {
+                                    await Provider.of<ProductProvider>(
+                                      context,
+                                      listen: false,
+                                    ).fetchProducts();
+
+                                    if (!context.mounted) return;
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(

@@ -2,34 +2,40 @@ import 'package:flutter/foundation.dart';
 
 class AppConstants {
   // Use 10.0.2.2 for Android Emulator, or 127.0.0.1 for Web/Desktop
-  static const String baseUrl = kIsWeb
-      ? "http://127.0.0.1/warkop_api"
-      : "http://10.0.2.2/warkop_api";
+  static String get baseUrl {
+    if (kIsWeb) {
+      return "http://127.0.0.1/warkop_api";
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
+      return "http://10.0.2.2/warkop_api";
+    } else {
+      return "http://127.0.0.1/warkop_api";
+    }
+  }
 
   // Auth Endpoints
-  static const String loginUrl = "$baseUrl/auth/login.php";
+  static String get loginUrl => "$baseUrl/auth/login.php";
 
   // Products Endpoints
-  static const String getProductsUrl = "$baseUrl/products/get_products.php";
-  static const String addProductUrl = "$baseUrl/products/add_product.php";
-  static const String updateStockUrl = "$baseUrl/products/update_stock.php";
+  static String get getProductsUrl => "$baseUrl/products/get_products.php";
+  static String get addProductUrl => "$baseUrl/products/add_product.php";
+  static String get updateStockUrl => "$baseUrl/products/update_stock.php";
 
   // Attendance Endpoints
-  static const String checkinUrl = "$baseUrl/attendance/checkin.php";
-  static const String checkoutUrl = "$baseUrl/attendance/checkout.php";
+  static String get checkinUrl => "$baseUrl/attendance/checkin.php";
+  static String get checkoutUrl => "$baseUrl/attendance/checkout.php";
 
   // Sales Endpoints
-  static const String addSaleUrl = "$baseUrl/sales/add_sale.php";
+  static String get addSaleUrl => "$baseUrl/sales/add_sale.php";
 
   // Reports Endpoints
-  static const String salesReportUrl = "$baseUrl/reports/sales_report.php";
-  static const String attendanceReportUrl =
+  static String get salesReportUrl => "$baseUrl/reports/sales_report.php";
+  static String get attendanceReportUrl =>
       "$baseUrl/reports/attendance_report.php";
 
   // Uploads Path
-  static const String productImagesUrl = "$baseUrl/uploads/products/";
-  static const String attendanceImagesInUrl =
+  static String get productImagesUrl => "$baseUrl/uploads/products/";
+  static String get attendanceImagesInUrl =>
       "$baseUrl/uploads/attendance/masuk/";
-  static const String attendanceImagesOutUrl =
+  static String get attendanceImagesOutUrl =>
       "$baseUrl/uploads/attendance/pulang/";
 }
