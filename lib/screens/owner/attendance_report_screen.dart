@@ -46,22 +46,33 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
               child: CircularProgressIndicator(color: Color(0xFF6B4226)),
             );
 
-          if (provider.attendanceRecords.isEmpty) {
-            return const Center(
-              child: Text(
-                'Belum ada log kehadiran.',
-                style: TextStyle(color: Colors.grey),
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(20),
-            itemCount: provider.attendanceRecords.length,
-            itemBuilder: (context, index) {
-              final log = provider.attendanceRecords[index];
-              return _buildAttendanceCard(log);
-            },
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchAttendanceReport(),
+            color: const Color(0xFF6B4226),
+            child: provider.attendanceRecords.isEmpty
+                ? const Center(
+                    child: SingleChildScrollView(
+                      physics: AlwaysScrollableScrollPhysics(),
+                      child: SizedBox(
+                        height: 400,
+                        child: Center(
+                          child: Text(
+                            'Belum ada log kehadiran.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    itemCount: provider.attendanceRecords.length,
+                    itemBuilder: (context, index) {
+                      final log = provider.attendanceRecords[index];
+                      return _buildAttendanceCard(log);
+                    },
+                  ),
           );
         },
       ),

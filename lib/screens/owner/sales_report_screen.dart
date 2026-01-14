@@ -64,115 +64,120 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
               child: CircularProgressIndicator(color: Color(0xFF6B4226)),
             );
 
-          return Column(
-            children: [
-              _buildAnalyticsSummary(provider),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(24, 24, 24, 12),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.history_rounded,
-                      color: Colors.white38,
-                      size: 16,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'RIWAYAT TRANSAKSI',
-                      style: TextStyle(
+          return RefreshIndicator(
+            onRefresh: () async => provider.fetchSalesReport(type: _filterType),
+            color: const Color(0xFF6B4226),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                _buildAnalyticsSummary(provider),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(24, 24, 24, 12),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.history_rounded,
                         color: Colors.white38,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
+                        size: 16,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'RIWAYAT TRANSAKSI',
+                        style: TextStyle(
+                          color: Colors.white38,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (provider.recentSales.isEmpty)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 40),
+                      child: Text(
+                        'Belum ada transaksi.',
+                        style: TextStyle(color: Colors.grey),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: provider.recentSales.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'Belum ada transaksi.',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      )
-                    : ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: provider.recentSales.length,
-                        itemBuilder: (context, index) {
-                          final sale = provider.recentSales[index];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF252525),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.05),
-                              ),
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 8,
-                              ),
-                              leading: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: const Color(
-                                    0xFF6B4226,
-                                  ).withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.receipt_rounded,
-                                  color: Color(0xFF6B4226),
-                                ),
-                              ),
-                              title: Text(
-                                'Rp ${sale['total_price']}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              subtitle: Text(
-                                'Oleh: ${sale['karyawan_name']}',
-                                style: const TextStyle(
-                                  color: Colors.white38,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              trailing: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Text(
-                                    sale['created_at']
-                                        .toString()
-                                        .split(' ')[1]
-                                        .substring(0, 5),
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    sale['created_at'].toString().split(' ')[0],
-                                    style: const TextStyle(
-                                      color: Colors.white24,
-                                      fontSize: 10,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                  )
+                else
+                  ...provider.recentSales.map((sale) {
+                    return Container(
+                      margin: const EdgeInsets.only(
+                        bottom: 12,
+                        left: 16,
+                        right: 16,
                       ),
-              ),
-            ],
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF252525),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.05),
+                        ),
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 8,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6B4226).withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.receipt_rounded,
+                            color: Color(0xFF6B4226),
+                          ),
+                        ),
+                        title: Text(
+                          'Rp ${sale['total_price']}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Oleh: ${sale['karyawan_name']}',
+                          style: const TextStyle(
+                            color: Colors.white38,
+                            fontSize: 12,
+                          ),
+                        ),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              sale['created_at']
+                                  .toString()
+                                  .split(' ')[1]
+                                  .substring(0, 5),
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              sale['created_at'].toString().split(' ')[0],
+                              style: const TextStyle(
+                                color: Colors.white24,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                const SizedBox(height: 40),
+              ],
+            ),
           );
         },
       ),

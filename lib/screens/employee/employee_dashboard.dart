@@ -58,172 +58,180 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundImage: (user?.photo != null)
-                          ? NetworkImage(
-                              AppConstants.profileImagesUrl + user!.photo!,
-                            )
-                          : null,
-                      backgroundColor: const Color(0xFF1F2937),
-                      child: (user?.photo == null)
-                          ? const Icon(Icons.person, color: Color(0xFF9CA3AF))
-                          : null,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Halo, ${user?.name ?? 'User'} 👋',
-                            style: const TextStyle(
-                              color: Color(0xFFE5E7EB),
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFF22C55E),
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Aktif Bekerja',
-                                style: TextStyle(
-                                  color: Color(0xFF22C55E),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                // Total Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF12172A),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF7C5CFF).withOpacity(0.15),
-                        blurRadius: 24,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                    border: Border.all(color: const Color(0xFF1F2937)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+          child: RefreshIndicator(
+            onRefresh: () async =>
+                reportProvider.fetchSalesReport(type: 'today'),
+            color: const Color(0xFF6B4226),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Row(
                     children: [
-                      const Text(
-                        '💰 Total Hari Ini',
-                        style: TextStyle(
-                          color: Color(0xFF9CA3AF),
-                          fontSize: 14,
-                        ),
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundImage: (user?.photo != null)
+                            ? NetworkImage(
+                                AppConstants.profileImagesUrl + user!.photo!,
+                              )
+                            : null,
+                        backgroundColor: const Color(0xFF1F2937),
+                        child: (user?.photo == null)
+                            ? const Icon(Icons.person, color: Color(0xFF9CA3AF))
+                            : null,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        NumberFormat.currency(
-                          locale: 'id_ID',
-                          symbol: 'Rp ',
-                          decimalDigits: 0,
-                        ).format(totalToday),
-                        style: const TextStyle(
-                          color: Color(0xFFE5E7EB),
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Halo, ${user?.name ?? 'User'} 👋',
+                              style: const TextStyle(
+                                color: Color(0xFFE5E7EB),
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF22C55E),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Aktif Bekerja',
+                                  style: TextStyle(
+                                    color: Color(0xFF22C55E),
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ),
 
-                const SizedBox(height: 32),
+                  const SizedBox(height: 32),
 
-                const Text(
-                  'Menu Operasional',
-                  style: TextStyle(
-                    color: Color(0xFF9CA3AF),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Menu List
-                _buildMenuItem(
-                  title: 'Absensi Hadir',
-                  subtitle: 'Check-in & Check-out',
-                  icon: Icons.access_time_filled_rounded,
-                  color: const Color(0xFF7C5CFF),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AttendanceScreen()),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildMenuItem(
-                  title: 'Catat Penjualan',
-                  subtitle: 'Input pesanan baru',
-                  icon: Icons.calculate_rounded,
-                  color: const Color(0xFFF59E0B),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AddSaleScreen()),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _buildMenuItem(
-                  title: 'Riwayat Penjualan',
-                  subtitle: 'Lihat laporan transaksi',
-                  icon: Icons.bar_chart_rounded,
-                  color: const Color(0xFF22D3EE),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SalesReportScreen(),
+                  // Total Card
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF12172A),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF7C5CFF).withOpacity(0.15),
+                          blurRadius: 24,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                      border: Border.all(color: const Color(0xFF1F2937)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          '💰 Total Hari Ini',
+                          style: TextStyle(
+                            color: Color(0xFF9CA3AF),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          NumberFormat.currency(
+                            locale: 'id_ID',
+                            symbol: 'Rp ',
+                            decimalDigits: 0,
+                          ).format(totalToday),
+                          style: const TextStyle(
+                            color: Color(0xFFE5E7EB),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                _buildMenuItem(
-                  title: 'Pengaturan',
-                  subtitle: 'Profil & Akun',
-                  icon: Icons.settings_rounded,
-                  color: const Color(0xFFEC4899),
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
+
+                  const SizedBox(height: 32),
+
+                  const Text(
+                    'Menu Operasional',
+                    style: TextStyle(
+                      color: Color(0xFF9CA3AF),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 16),
+
+                  // Menu List
+                  _buildMenuItem(
+                    title: 'Absensi Hadir',
+                    subtitle: 'Check-in & Check-out',
+                    icon: Icons.access_time_filled_rounded,
+                    color: const Color(0xFF7C5CFF),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AttendanceScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMenuItem(
+                    title: 'Catat Penjualan',
+                    subtitle: 'Input pesanan baru',
+                    icon: Icons.calculate_rounded,
+                    color: const Color(0xFFF59E0B),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AddSaleScreen()),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMenuItem(
+                    title: 'Riwayat Penjualan',
+                    subtitle: 'Lihat laporan transaksi',
+                    icon: Icons.bar_chart_rounded,
+                    color: const Color(0xFF22D3EE),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SalesReportScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMenuItem(
+                    title: 'Pengaturan',
+                    subtitle: 'Profil & Akun',
+                    icon: Icons.settings_rounded,
+                    color: const Color(0xFFEC4899),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

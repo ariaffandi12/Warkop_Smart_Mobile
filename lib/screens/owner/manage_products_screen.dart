@@ -62,126 +62,130 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
               child: CircularProgressIndicator(color: Color(0xFF6B4226)),
             );
 
-          return ListView.builder(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
-            itemCount: provider.products.length,
-            itemBuilder: (context, index) {
-              final product = provider.products[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF252525),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.05),
+          return RefreshIndicator(
+            onRefresh: () => provider.fetchProducts(),
+            color: const Color(0xFF6B4226),
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
+              itemCount: provider.products.length,
+              itemBuilder: (context, index) {
+                final product = provider.products[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF252525),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
                   ),
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  leading: Hero(
-                    tag: 'product_${product.id}',
-                    child: Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white10,
-                        borderRadius: BorderRadius.circular(16),
-                        image: product.imageUrl != null
-                            ? DecorationImage(
-                                image: NetworkImage(
-                                  AppConstants.productImagesUrl +
-                                      product.imageUrl!,
-                                ),
-                                fit: BoxFit.cover,
-                              )
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(16),
+                    leading: Hero(
+                      tag: 'product_${product.id}',
+                      child: Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          color: Colors.white10,
+                          borderRadius: BorderRadius.circular(16),
+                          image: product.imageUrl != null
+                              ? DecorationImage(
+                                  image: NetworkImage(
+                                    AppConstants.productImagesUrl +
+                                        product.imageUrl!,
+                                  ),
+                                  fit: BoxFit.cover,
+                                )
+                              : null,
+                        ),
+                        child: product.imageUrl == null
+                            ? const Icon(Icons.coffee, color: Colors.white24)
                             : null,
                       ),
-                      child: product.imageUrl == null
-                          ? const Icon(Icons.coffee, color: Colors.white24)
-                          : null,
                     ),
-                  ),
-                  title: Text(
-                    product.name,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                    title: Text(
+                      product.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF6B4226,
-                            ).withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            'Rp ${product.price}',
-                            style: const TextStyle(
-                              color: Color(0xFFBC8F8F),
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFF6B4226,
+                              ).withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'Rp ${product.price}',
+                              style: const TextStyle(
+                                color: Color(0xFFBC8F8F),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Text(
-                          'Stok: ${product.stock}',
-                          style: TextStyle(
-                            color: product.stock < 10
-                                ? Colors.redAccent
-                                : Colors.white38,
-                            fontSize: 12,
+                          const SizedBox(width: 10),
+                          Text(
+                            'Stok: ${product.stock}',
+                            style: TextStyle(
+                              color: product.stock < 10
+                                  ? Colors.redAccent
+                                  : Colors.white38,
+                              fontSize: 12,
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit_rounded,
+                            color: Color(0xFFF59E0B),
+                          ),
+                          onPressed: () =>
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      EditProductScreen(product: product),
+                                ),
+                              ).then((_) {
+                                // Refresh list after returning from edit
+                                Provider.of<ProductProvider>(
+                                  context,
+                                  listen: false,
+                                ).fetchProducts();
+                              }),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_rounded,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () =>
+                              _showDeleteDialog(context, product.id, provider),
                         ),
                       ],
                     ),
                   ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit_rounded,
-                          color: Color(0xFFF59E0B),
-                        ),
-                        onPressed: () =>
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    EditProductScreen(product: product),
-                              ),
-                            ).then((_) {
-                              // Refresh list after returning from edit
-                              Provider.of<ProductProvider>(
-                                context,
-                                listen: false,
-                              ).fetchProducts();
-                            }),
-                      ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete_rounded,
-                          color: Colors.redAccent,
-                        ),
-                        onPressed: () =>
-                            _showDeleteDialog(context, product.id, provider),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),
