@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/product_provider.dart';
 import '../../utils/constants.dart';
 import 'add_product_screen.dart';
+import 'edit_product_screen.dart';
 
 class ManageProductsScreen extends StatefulWidget {
   const ManageProductsScreen({super.key});
@@ -145,16 +146,38 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                       ],
                     ),
                   ),
-                  trailing: IconButton(
-                    icon: const Icon(
-                      Icons.edit_note_rounded,
-                      color: Colors.white70,
-                    ),
-                    onPressed: () => _showUpdateStockDialog(
-                      context,
-                      product.id,
-                      product.stock,
-                    ),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit_rounded,
+                          color: Color(0xFFF59E0B),
+                        ),
+                        onPressed: () =>
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    EditProductScreen(product: product),
+                              ),
+                            ).then((_) {
+                              // Refresh list after returning from edit
+                              Provider.of<ProductProvider>(
+                                context,
+                                listen: false,
+                              ).fetchProducts();
+                            }),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.delete_rounded,
+                          color: Colors.redAccent,
+                        ),
+                        onPressed: () =>
+                            _showDeleteDialog(context, product.id, provider),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -165,51 +188,44 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
     );
   }
 
-  void _showUpdateStockDialog(BuildContext context, int id, int currentStock) {
-    final controller = TextEditingController(text: currentStock.toString());
+  void _showDeleteDialog(
+    BuildContext context,
+    int id,
+    ProductProvider provider,
+  ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF252525),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
-          'Update Stok',
+          'Hapus Produk?',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white),
-          decoration: InputDecoration(
-            labelText: 'Jumlah Stok Baru',
-            labelStyle: const TextStyle(color: Colors.white38),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.white12),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF6B4226)),
-            ),
-          ),
+        content: const Text(
+          'Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.',
+          style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('BATAL', style: TextStyle(color: Colors.white38)),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('BATAL', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
-              final success = await Provider.of<ProductProvider>(
-                context,
-                listen: false,
-              ).updateStock(id, int.parse(controller.text));
+              Navigator.pop(ctx);
+              final success = await provider.deleteProduct(id);
               if (mounted) {
-                Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
                       success
-                          ? 'Stok berhasil diperbarui'
-                          : 'Gagal memperbarui stok',
+                          ? 'Produk berhasil dihapus'
+                          : 'Gagal menghapus produk',
                     ),
                     backgroundColor: success ? Colors.green : Colors.redAccent,
                     behavior: SnackBarBehavior.floating,
@@ -217,11 +233,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6B4226),
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('SIMPAN'),
+            child: const Text('HAPUS'),
           ),
         ],
       ),

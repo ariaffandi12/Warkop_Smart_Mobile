@@ -5,22 +5,48 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import '../../providers/product_provider.dart';
+import '../../models/product_model.dart';
+import '../../utils/constants.dart';
 
-class AddProductScreen extends StatefulWidget {
-  const AddProductScreen({super.key});
+class EditProductScreen extends StatefulWidget {
+  final ProductModel product;
+  const EditProductScreen({super.key, required this.product});
 
   @override
-  State<AddProductScreen> createState() => _AddProductScreenState();
+  State<EditProductScreen> createState() => _EditProductScreenState();
 }
 
-class _AddProductScreenState extends State<AddProductScreen> {
+class _EditProductScreenState extends State<EditProductScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _stockController = TextEditingController();
+  late TextEditingController _nameController;
+  late TextEditingController _priceController;
+  late TextEditingController _stockController;
   File? _image;
-
   final _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.product.name);
+
+    // Format initial price with grouping separators
+    final formatter = NumberFormat('#,###', 'id_ID');
+    _priceController = TextEditingController(
+      text: formatter.format(widget.product.price),
+    );
+
+    _stockController = TextEditingController(
+      text: widget.product.stock.toString(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    _stockController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
@@ -34,7 +60,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Produk')),
+      appBar: AppBar(title: const Text('Edit Produk')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -95,34 +121,32 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
                     borderRadius: BorderRadius.circular(20),
-                    border: _image == null
-                        ? Border.all(color: Colors.redAccent, width: 1)
-                        : null,
                   ),
-                  child: _image == null
-                      ? const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.add_a_photo,
-                              size: 40,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Wajib Foto',
-                              style: TextStyle(
-                                color: Colors.redAccent,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        )
-                      : ClipRRect(
+                  child: _image != null
+                      ? ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.file(_image!, fit: BoxFit.cover),
+                        )
+                      : (widget.product.imageUrl != null)
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.network(
+                            AppConstants.productImagesUrl +
+                                widget.product.imageUrl!,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : const Icon(
+                          Icons.add_a_photo,
+                          size: 40,
+                          color: Colors.grey,
                         ),
                 ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Ketuk gambar untuk mengubah',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
               const SizedBox(height: 32),
               TextFormField(
@@ -153,7 +177,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               TextFormField(
                 controller: _stockController,
                 decoration: const InputDecoration(
-                  labelText: 'Stok Awal',
+                  labelText: 'Stok',
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
@@ -177,40 +201,29 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         ? null
                         : () async {
                             if (_formKey.currentState!.validate()) {
-                              if (_image == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Wajib upload foto produk'),
-                                    backgroundColor: Colors.redAccent,
-                                  ),
-                                );
-                                return;
-                              }
-
-                              // Remove non-digits for API submission
                               final cleanPrice = _priceController.text
                                   .replaceAll(RegExp(r'[^0-9]'), '');
 
-                              final success = await provider.addProduct(
+                              final success = await provider.updateProduct(
+                                widget.product.id,
                                 _nameController.text,
                                 int.parse(cleanPrice),
                                 int.parse(_stockController.text),
                                 _image,
                               );
+
                               if (success && mounted) {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text(
-                                      'Produk berhasil ditambahkan',
-                                    ),
+                                    content: Text('Produk berhasil diupdate'),
                                     backgroundColor: Colors.green,
                                   ),
                                 );
                               } else if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Gagal menambahkan produk'),
+                                    content: Text('Gagal update produk'),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -220,7 +233,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     child: provider.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
-                            'SIMPAN PRODUK',
+                            'UPDATE PRODUK',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                   ),

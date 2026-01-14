@@ -28,7 +28,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
       backgroundColor: const Color(0xFF1B1B1B),
       appBar: AppBar(
         title: const Text(
-          'Log Kehadiran Staf',
+          'Log Kehadiran Karyawan',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,

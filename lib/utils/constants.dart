@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 class AppConstants {
   // Available modes: 'emulator', 'hp', 'web'
   static const String mode = 'hp';
@@ -23,6 +21,8 @@ class AppConstants {
   // Products Endpoints
   static String get getProductsUrl => "$baseUrl/products/get_products.php";
   static String get addProductUrl => "$baseUrl/products/add_product.php";
+  static String get updateProductUrl => "$baseUrl/products/update_product.php";
+  static String get deleteProductUrl => "$baseUrl/products/delete_product.php";
   static String get updateStockUrl => "$baseUrl/products/update_stock.php";
 
   // Attendance Endpoints

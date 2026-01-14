@@ -74,6 +74,74 @@ class ProductProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateProduct(
+    int id,
+    String name,
+    int price,
+    int stock,
+    File? image,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(AppConstants.updateProductUrl),
+      );
+      request.fields['id'] = id.toString();
+      request.fields['name'] = name;
+      request.fields['price'] = price.toString();
+      request.fields['stock'] = stock.toString();
+
+      if (image != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('image', image.path),
+        );
+      }
+
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+      var data = json.decode(responseData);
+
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        await fetchProducts();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error updating product: $e");
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> deleteProduct(int id) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await http.post(
+        Uri.parse(AppConstants.deleteProductUrl),
+        body: json.encode({'id': id}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final data = json.decode(response.body);
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        await fetchProducts();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error deleting product: $e");
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> updateStock(int id, int newStock) async {
     try {
       final response = await http.post(
