@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import 'attendance_screen.dart';
 import 'add_sale_screen.dart';
 import '../auth/login_screen.dart';
+import '../owner/sales_report_screen.dart';
 
 class EmployeeDashboard extends StatefulWidget {
   const EmployeeDashboard({super.key});
@@ -210,11 +211,16 @@ class _EmployeeDashboardState extends State<EmployeeDashboard>
                       ),
                       _buildAnimatedMenu(
                         index: 2,
-                        title: 'Riwayat Laku',
+                        title: 'Riwayat Penjualan',
                         subtitle: 'Cek Penjualan',
                         icon: Icons.auto_graph_rounded,
                         color: Colors.tealAccent.shade700,
-                        onTap: () {},
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const SalesReportScreen(),
+                          ),
+                        ),
                       ),
                       _buildAnimatedMenu(
                         index: 3,
