@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/sales_provider.dart';
@@ -183,7 +184,11 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Rp ${product.price}',
+                      NumberFormat.currency(
+                        locale: 'id',
+                        symbol: 'Rp ',
+                        decimalDigits: 0,
+                      ).format(product.price),
                       style: const TextStyle(
                         color: Color(0xFF6B4226),
                         fontWeight: FontWeight.bold,
