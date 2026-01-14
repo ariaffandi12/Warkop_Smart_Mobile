@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../profile_screen.dart';
 import 'attendance_screen.dart';
 import 'add_sale_screen.dart';
 import '../auth/login_screen.dart';
@@ -228,7 +229,12 @@ class _EmployeeDashboardState extends State<EmployeeDashboard>
                         subtitle: 'Kelola Profil',
                         icon: Icons.tune_rounded,
                         color: Colors.deepPurpleAccent,
-                        onTap: () {},
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ProfileScreen(),
+                          ),
+                        ),
                       ),
                     ],
                   ),
