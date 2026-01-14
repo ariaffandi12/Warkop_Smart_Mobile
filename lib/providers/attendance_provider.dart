@@ -29,7 +29,8 @@ class AttendanceProvider with ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      return response.statusCode == 201 && data['status'] == 'success';
+      return (response.statusCode == 201 || response.statusCode == 200) &&
+          data['status'] == 'success';
     } catch (e) {
       _isLoading = false;
       notifyListeners();
