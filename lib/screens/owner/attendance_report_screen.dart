@@ -25,56 +25,42 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Laporan Absensi')),
+      backgroundColor: const Color(0xFF1B1B1B),
+      appBar: AppBar(
+        title: const Text(
+          'Log Kehadiran Staf',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: const Color(0xFF1B1B1B),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Consumer<ReportProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading)
-            return const Center(child: CircularProgressIndicator());
-          if (provider.attendanceRecords.isEmpty)
-            return const Center(child: Text('Tidak ada riwayat absensi.'));
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF6B4226)),
+            );
+
+          if (provider.attendanceRecords.isEmpty) {
+            return const Center(
+              child: Text(
+                'Belum ada log kehadiran.',
+                style: TextStyle(color: Colors.grey),
+              ),
+            );
+          }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             itemCount: provider.attendanceRecords.length,
             itemBuilder: (context, index) {
-              final record = provider.attendanceRecords[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        record['karyawan_name'],
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildTimeInfo(
-                            'Masuk',
-                            record['check_in'],
-                            record['photo_in'],
-                            AppConstants.attendanceImagesInUrl,
-                          ),
-                          if (record['check_out'] != null)
-                            _buildTimeInfo(
-                              'Pulang',
-                              record['check_out'],
-                              record['photo_out'],
-                              AppConstants.attendanceImagesOutUrl,
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
+              final log = provider.attendanceRecords[index];
+              return _buildAttendanceCard(log);
             },
           );
         },
@@ -82,32 +68,154 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
     );
   }
 
-  Widget _buildTimeInfo(
-    String label,
-    String? time,
-    String? photo,
-    String baseUrl,
-  ) {
+  Widget _buildAttendanceCard(dynamic log) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF252525),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person_outline_rounded,
+                  color: Colors.amber,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      log['karyawan_name'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      log['check_in'].toString().split(' ')[0],
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: log['status'] == 'selesai'
+                      ? Colors.green.withValues(alpha: 0.1)
+                      : Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  log['status'] == 'selesai' ? 'SELESAI' : 'BEKERJA',
+                  style: TextStyle(
+                    color: log['status'] == 'selesai'
+                        ? Colors.green
+                        : Colors.orange,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _buildPhotoColumn(
+                'Masuk',
+                log['photo_in'],
+                log['check_in'].toString().split(' ')[1],
+              ),
+              const Spacer(),
+              _buildPhotoColumn(
+                'Pulang',
+                log['photo_out'],
+                log['check_out']?.toString().split(' ')[1] ?? '--:--',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPhotoColumn(String label, String? photo, String time) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
         Text(
-          time?.split(' ')[1] ?? '-',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        if (photo != null)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              baseUrl + photo,
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
-            ),
+          label,
+          style: const TextStyle(
+            color: Colors.white38,
+            fontSize: 10,
+            letterSpacing: 1,
+            fontWeight: FontWeight.bold,
           ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.white10,
+                borderRadius: BorderRadius.circular(12),
+                image: (photo != null && photo.isNotEmpty)
+                    ? DecorationImage(
+                        image: NetworkImage(
+                          (label == 'Masuk'
+                                  ? AppConstants.attendanceImagesInUrl
+                                  : AppConstants.attendanceImagesOutUrl) +
+                              photo,
+                        ),
+                        fit: BoxFit.cover,
+                      )
+                    : null,
+              ),
+              child: (photo == null || photo.isEmpty)
+                  ? const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Colors.white24,
+                      size: 20,
+                    )
+                  : null,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              time.substring(0, 5),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

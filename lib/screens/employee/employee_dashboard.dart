@@ -3,189 +3,303 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import 'attendance_screen.dart';
 import 'add_sale_screen.dart';
+import '../auth/login_screen.dart';
 
-class EmployeeDashboard extends StatelessWidget {
+class EmployeeDashboard extends StatefulWidget {
   const EmployeeDashboard({super.key});
+
+  @override
+  State<EmployeeDashboard> createState() => _EmployeeDashboardState();
+}
+
+class _EmployeeDashboardState extends State<EmployeeDashboard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _staggeredController;
+
+  @override
+  void initState() {
+    super.initState();
+    _staggeredController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    );
+    _staggeredController.forward();
+  }
+
+  @override
+  void dispose() {
+    _staggeredController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F1),
+      backgroundColor: const Color(0xFFFAF9F6),
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Halo, ${user?.name ?? 'Karyawan'}',
-              style: const TextStyle(
-                color: Color(0xFF2C1B0E),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Text(
-              'Semangat kerjanya hari ini!',
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          ],
+        title: Text(
+          'Warkop Smart Mobile',
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.9),
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Color(0xFF6B4226)),
-            onPressed: () =>
-                Provider.of<AuthProvider>(context, listen: false).logout(),
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.power_settings_new_rounded,
+                color: Colors.white,
+                size: 20,
+              ),
+              onPressed: () {
+                Provider.of<AuthProvider>(context, listen: false).logout();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              },
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Status Card
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6B4226), Color(0xFF8B5E3C)],
-                ),
-                borderRadius: BorderRadius.circular(24),
+      body: Column(
+        children: [
+          // Premium Header with Profile
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(24, 100, 24, 40),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF3E2723), Color(0xFF6B4226)],
               ),
-              child: const Row(
-                children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white24,
-                    child: Icon(Icons.person, color: Colors.white, size: 30),
-                  ),
-                  SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Status Absensi',
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 20,
+                  offset: Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.white24,
+                        shape: BoxShape.circle,
                       ),
-                      Text(
-                        'Belum Check-in',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                      child: const CircleAvatar(
+                        radius: 32,
+                        backgroundColor: Colors.white,
+                        child: Icon(
+                          Icons.person,
+                          color: Color(0xFF6B4226),
+                          size: 32,
                         ),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Halo, ${user?.name ?? 'Karyawan'}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.greenAccent.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Text(
+                            'Status: Aktif Bekerja',
+                            style: TextStyle(
+                              color: Colors.greenAccent,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Menu Operasional',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF2C1B0E),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Staggered Grid
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 20,
+                    children: [
+                      _buildAnimatedMenu(
+                        index: 0,
+                        title: 'Absensi Hadir',
+                        subtitle: 'Check-in/out',
+                        icon: Icons.face_retouching_natural_rounded,
+                        color: Colors.indigoAccent,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AttendanceScreen(),
+                          ),
+                        ),
+                      ),
+                      _buildAnimatedMenu(
+                        index: 1,
+                        title: 'Catat Jualan',
+                        subtitle: 'Input Pesanan',
+                        icon: Icons.point_of_sale_rounded,
+                        color: Colors.orangeAccent,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AddSaleScreen(),
+                          ),
+                        ),
+                      ),
+                      _buildAnimatedMenu(
+                        index: 2,
+                        title: 'Riwayat Laku',
+                        subtitle: 'Cek Penjualan',
+                        icon: Icons.auto_graph_rounded,
+                        color: Colors.tealAccent.shade700,
+                        onTap: () {},
+                      ),
+                      _buildAnimatedMenu(
+                        index: 3,
+                        title: 'Pengaturan',
+                        subtitle: 'Kelola Profil',
+                        icon: Icons.tune_rounded,
+                        color: Colors.deepPurpleAccent,
+                        onTap: () {},
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            const Text(
-              'Menu Utama',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2C1B0E),
-              ),
-            ),
-            const SizedBox(height: 16),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              children: [
-                _buildMenuCard(
-                  context,
-                  title: 'Absensi',
-                  icon: Icons.camera_alt_rounded,
-                  color: Colors.blue,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AttendanceScreen()),
-                  ),
-                ),
-                _buildMenuCard(
-                  context,
-                  title: 'Tambah Jualan',
-                  icon: Icons.add_shopping_cart_rounded,
-                  color: Colors.orange,
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const AddSaleScreen()),
-                  ),
-                ),
-                _buildMenuCard(
-                  context,
-                  title: 'Riwayat Hari Ini',
-                  icon: Icons.history_rounded,
-                  color: Colors.green,
-                  onTap: () {},
-                ),
-                _buildMenuCard(
-                  context,
-                  title: 'Profil',
-                  icon: Icons.account_circle_rounded,
-                  color: Colors.purple,
-                  onTap: () {},
-                ),
-              ],
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildMenuCard(
-    BuildContext context, {
+  Widget _buildAnimatedMenu({
+    required int index,
     required String title,
+    required String subtitle,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+    final animation = CurvedAnimation(
+      parent: _staggeredController,
+      curve: Interval(
+        (index * 0.1).clamp(0, 1.0),
+        1.0,
+        curve: Curves.easeOutQuart,
+      ),
+    );
+
+    return ScaleTransition(
+      scale: animation,
+      child: FadeTransition(
+        opacity: animation,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(32),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: Colors.black.withOpacity(0.05)),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Icon(icon, color: color, size: 32),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF2C1B0E),
+                    fontSize: 13,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(color: Colors.grey, fontSize: 11),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2C1B0E),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

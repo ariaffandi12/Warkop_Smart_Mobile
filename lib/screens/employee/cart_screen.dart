@@ -8,53 +8,140 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final salesProvider = Provider.of<SalesProvider>(context);
-    final userId = Provider.of<AuthProvider>(context, listen: false).user!.id;
+    final sales = Provider.of<SalesProvider>(context);
+    final userId = Provider.of<AuthProvider>(context, listen: false).user?.id;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Keranjang Belanja')),
-      body: salesProvider.cart.isEmpty
-          ? const Center(child: Text('Keranjang kosong'))
+      backgroundColor: const Color(0xFFFAF9F6),
+      appBar: AppBar(
+        title: const Text(
+          'Pesanan Anda',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2C1B0E),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Color(0xFF2C1B0E)),
+      ),
+      body: sales.cart.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.shopping_basket_outlined,
+                    size: 80,
+                    color: Colors.brown[200],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Keranjang masih kosong',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                ],
+              ),
+            )
           : Column(
               children: [
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: salesProvider.cart.length,
+                    padding: const EdgeInsets.all(20),
+                    itemCount: sales.cart.length,
                     itemBuilder: (context, index) {
-                      final item = salesProvider.cart[index];
-                      return ListTile(
-                        title: Text(item.productName),
-                        subtitle: Text('Rp ${item.price} x ${item.quantity}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Rp ${item.price * item.quantity}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                      final item = sales.cart[index];
+                      return Dismissible(
+                        key: Key('cart_${item.productId}'),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.white,
+                          ),
+                        ),
+                        onDismissed: (_) {
+                          sales.removeFromCart(item.productId);
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: Colors.black.withOpacity(0.05),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF5E6DA),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Icon(
+                                  Icons.coffee,
+                                  color: Color(0xFF6B4226),
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () =>
-                                  salesProvider.removeFromCart(item.productId),
-                            ),
-                          ],
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.productName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Rp ${item.price} x ${item.quantity}',
+                                      style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                'Rp ${item.price * item.quantity}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF6B4226),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
                   ),
                 ),
+                // Premium Checkout Summary
                 Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 40),
+                  decoration: const BoxDecoration(
                     color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, -2),
+                        color: Colors.black12,
+                        blurRadius: 40,
+                        offset: Offset(0, -10),
                       ),
                     ],
                   ),
@@ -65,14 +152,14 @@ class CartScreen extends StatelessWidget {
                         children: [
                           const Text(
                             'Total Pembayaran',
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(color: Colors.grey, fontSize: 16),
                           ),
                           Text(
-                            'Rp ${salesProvider.totalAmount}',
+                            'Rp ${sales.totalAmount}',
                             style: const TextStyle(
                               fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF6B4226),
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF2C1B0E),
                             ),
                           ),
                         ],
@@ -80,37 +167,47 @@ class CartScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       SizedBox(
                         width: double.infinity,
-                        height: 56,
+                        height: 64,
                         child: ElevatedButton(
-                          onPressed: salesProvider.isLoading
+                          onPressed: sales.isLoading
                               ? null
                               : () async {
-                                  final success = await salesProvider
-                                      .processSale(userId);
+                                  final success = await sales.processSale(
+                                    userId!,
+                                  );
                                   if (success && context.mounted) {
+                                    Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Transaksi Berhasil!'),
+                                        backgroundColor: Colors.green,
+                                        behavior: SnackBarBehavior.floating,
                                       ),
                                     );
-                                    Navigator.pop(context); // Back to products
-                                    Navigator.pop(context); // Back to dashboard
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF6B4226),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(20),
                             ),
+                            elevation: 8,
+                            shadowColor: const Color(
+                              0xFF6B4226,
+                            ).withOpacity(0.4),
                           ),
-                          child: salesProvider.isLoading
+                          child: sales.isLoading
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
                               : const Text(
-                                  'PROSES TRANSAKSI',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  'KONFIRMASI PESANAN',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1,
+                                  ),
                                 ),
                         ),
                       ),

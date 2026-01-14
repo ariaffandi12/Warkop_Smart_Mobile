@@ -72,7 +72,8 @@ class SalesProvider with ChangeNotifier {
       );
 
       final data = json.decode(response.body);
-      if (response.statusCode == 201 && data['status'] == 'success') {
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          data['status'] == 'success') {
         clearCart();
         return true;
       }

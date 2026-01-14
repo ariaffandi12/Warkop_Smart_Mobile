@@ -30,10 +30,22 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1B1B1B),
       appBar: AppBar(
-        title: const Text('Laporan Penjualan'),
+        title: const Text(
+          'Laporan Penjualan',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: const Color(0xFF1B1B1B),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           PopupMenuButton<String>(
+            icon: const Icon(Icons.filter_list_rounded, color: Colors.white70),
             onSelected: (value) {
               setState(() => _filterType = value);
               _fetchData();
@@ -48,30 +60,30 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
       body: Consumer<ReportProvider>(
         builder: (context, provider, _) {
           if (provider.isLoading)
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Color(0xFF6B4226)),
+            );
 
           return Column(
             children: [
-              Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6B4226),
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              _buildAnalyticsSummary(provider),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(24, 24, 24, 12),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Total Pendapatan',
-                      style: TextStyle(color: Colors.white70),
+                    Icon(
+                      Icons.history_rounded,
+                      color: Colors.white38,
+                      size: 16,
                     ),
+                    SizedBox(width: 8),
                     Text(
-                      'Rp ${provider.salesSummary?['total_income'] ?? 0}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+                      'RIWAYAT TRANSAKSI',
+                      style: TextStyle(
+                        color: Colors.white38,
+                        fontSize: 10,
                         fontWeight: FontWeight.bold,
+                        letterSpacing: 2,
                       ),
                     ),
                   ],
@@ -79,19 +91,81 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
               ),
               Expanded(
                 child: provider.recentSales.isEmpty
-                    ? const Center(child: Text('Belum ada transaksi.'))
+                    ? const Center(
+                        child: Text(
+                          'Belum ada transaksi.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      )
                     : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: provider.recentSales.length,
                         itemBuilder: (context, index) {
                           final sale = provider.recentSales[index];
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 8),
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF252525),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.05),
+                              ),
+                            ),
                             child: ListTile(
-                              title: Text('Rp ${sale['total_price']}'),
-                              subtitle: Text('Oleh: ${sale['karyawan_name']}'),
-                              trailing: Text(
-                                sale['created_at'].toString().split(' ')[1],
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 8,
+                              ),
+                              leading: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFF6B4226,
+                                  ).withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.receipt_rounded,
+                                  color: Color(0xFF6B4226),
+                                ),
+                              ),
+                              title: Text(
+                                'Rp ${sale['total_price']}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Oleh: ${sale['karyawan_name']}',
+                                style: const TextStyle(
+                                  color: Colors.white38,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              trailing: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    sale['created_at']
+                                        .toString()
+                                        .split(' ')[1]
+                                        .substring(0, 5),
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    sale['created_at'].toString().split(' ')[0],
+                                    style: const TextStyle(
+                                      color: Colors.white24,
+                                      fontSize: 10,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
@@ -102,6 +176,85 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildAnalyticsSummary(ReportProvider provider) {
+    return Container(
+      margin: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF2C1B0E),
+            const Color(0xFF1B1B1B).withOpacity(0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: Colors.white12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black38,
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const Text(
+            'Total Pendapatan',
+            style: TextStyle(
+              color: Colors.white38,
+              fontSize: 12,
+              letterSpacing: 1,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Rp ${provider.salesSummary?['total_income'] ?? 0}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 32,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Divider(color: Colors.white12),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem(
+                provider.salesSummary?['total_transactions']?.toString() ?? '0',
+                'Total Transaksi',
+              ),
+              _buildStatItem('Status', 'Success'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white38, fontSize: 10),
+        ),
+      ],
     );
   }
 }

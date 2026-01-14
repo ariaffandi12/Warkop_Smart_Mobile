@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
+
 class AppConstants {
-  // Use 10.0.2.2 for Android Emulator, or your local machine IP for physical devices
-  static const String baseUrl = "http://10.0.2.2/warkop_api";
+  // Use 10.0.2.2 for Android Emulator, or 127.0.0.1 for Web/Desktop
+  static const String baseUrl = kIsWeb
+      ? "http://127.0.0.1/warkop_api"
+      : "http://10.0.2.2/warkop_api";
 
   // Auth Endpoints
   static const String loginUrl = "$baseUrl/auth/login.php";
