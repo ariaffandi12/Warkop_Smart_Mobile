@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ReportProvider()),
       ],
       child: MaterialApp(
-        title: 'Warkop Manager',
+        title: 'Warkop Smart Manager',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: true,
