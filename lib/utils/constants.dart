@@ -38,4 +38,6 @@ class AppConstants {
       "$baseUrl/uploads/attendance/masuk/";
   static String get attendanceImagesOutUrl =>
       "$baseUrl/uploads/attendance/pulang/";
+  static String get profileImagesUrl => "$baseUrl/uploads/profiles/";
+  static String get updateProfileUrl => "$baseUrl/auth/update_profile.php";
 }

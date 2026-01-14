@@ -6,6 +6,7 @@ import 'attendance_screen.dart';
 import 'add_sale_screen.dart';
 import '../auth/login_screen.dart';
 import '../owner/sales_report_screen.dart';
+import '../../utils/constants.dart';
 
 class EmployeeDashboard extends StatefulWidget {
   const EmployeeDashboard({super.key});
@@ -111,14 +112,21 @@ class _EmployeeDashboardState extends State<EmployeeDashboard>
                         color: Colors.white24,
                         shape: BoxShape.circle,
                       ),
-                      child: const CircleAvatar(
+                      child: CircleAvatar(
                         radius: 32,
                         backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person,
-                          color: Color(0xFF6B4226),
-                          size: 32,
-                        ),
+                        backgroundImage: (user?.photo != null)
+                            ? NetworkImage(
+                                AppConstants.profileImagesUrl + user!.photo!,
+                              )
+                            : null,
+                        child: (user?.photo == null)
+                            ? const Icon(
+                                Icons.person,
+                                color: Color(0xFF6B4226),
+                                size: 32,
+                              )
+                            : null,
                       ),
                     ),
                     const SizedBox(width: 20),
