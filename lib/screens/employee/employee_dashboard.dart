@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/report_provider.dart';
+import '../../utils/constants.dart';
 import '../profile_screen.dart';
 import 'attendance_screen.dart';
 import 'add_sale_screen.dart';
 import '../auth/login_screen.dart';
 import '../owner/sales_report_screen.dart';
-import '../../utils/constants.dart';
 
 class EmployeeDashboard extends StatefulWidget {
   const EmployeeDashboard({super.key});
@@ -15,310 +17,274 @@ class EmployeeDashboard extends StatefulWidget {
   State<EmployeeDashboard> createState() => _EmployeeDashboardState();
 }
 
-class _EmployeeDashboardState extends State<EmployeeDashboard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _staggeredController;
-
+class _EmployeeDashboardState extends State<EmployeeDashboard> {
   @override
   void initState() {
     super.initState();
-    _staggeredController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1000),
+    // Fetch today's sales report when dashboard loads
+    Future.microtask(
+      () => Provider.of<ReportProvider>(
+        context,
+        listen: false,
+      ).fetchSalesReport(type: 'today'),
     );
-    _staggeredController.forward();
-  }
-
-  @override
-  void dispose() {
-    _staggeredController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<AuthProvider>(context).user;
+    final reportProvider = Provider.of<ReportProvider>(context);
+
+    // Calculate total for today
+    int totalToday = 0;
+    if (reportProvider.salesSummary != null) {
+      // Assuming API returns total_amount as int or string
+      totalToday =
+          int.tryParse(
+            reportProvider.salesSummary!['total_income'].toString(),
+          ) ??
+          0;
+    }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F6),
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Warkop Smart Mobile',
-          style: TextStyle(
-            color: Colors.white.withOpacity(0.9),
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0B0F1A), Color(0xFF171C34)],
           ),
         ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.power_settings_new_rounded,
-                color: Colors.white,
-                size: 20,
-              ),
-              onPressed: () {
-                Provider.of<AuthProvider>(context, listen: false).logout();
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                  (route) => false,
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Premium Header with Profile
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(24, 100, 24, 40),
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF3E2723), Color(0xFF6B4226)],
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(40),
-                bottomRight: Radius.circular(40),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 20,
-                  offset: Offset(0, 10),
-                ),
-              ],
-            ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Header
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.white24,
-                        shape: BoxShape.circle,
-                      ),
-                      child: CircleAvatar(
-                        radius: 32,
-                        backgroundColor: Colors.white,
-                        backgroundImage: (user?.photo != null)
-                            ? NetworkImage(
-                                AppConstants.profileImagesUrl + user!.photo!,
-                              )
-                            : null,
-                        child: (user?.photo == null)
-                            ? const Icon(
-                                Icons.person,
-                                color: Color(0xFF6B4226),
-                                size: 32,
-                              )
-                            : null,
-                      ),
+                    CircleAvatar(
+                      radius: 24,
+                      backgroundImage: (user?.photo != null)
+                          ? NetworkImage(
+                              AppConstants.profileImagesUrl + user!.photo!,
+                            )
+                          : null,
+                      backgroundColor: const Color(0xFF1F2937),
+                      child: (user?.photo == null)
+                          ? const Icon(Icons.person, color: Color(0xFF9CA3AF))
+                          : null,
                     ),
-                    const SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Halo, ${user?.name ?? 'Karyawan'}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.greenAccent.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            'Status: Aktif Bekerja',
-                            style: TextStyle(
-                              color: Colors.greenAccent,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Halo, ${user?.name ?? 'User'} 👋',
+                            style: const TextStyle(
+                              color: Color(0xFFE5E7EB),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFF22C55E),
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Aktif Bekerja',
+                                style: TextStyle(
+                                  color: Color(0xFF22C55E),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Menu Operasional',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF2C1B0E),
-                    ),
+                const SizedBox(height: 32),
+
+                // Total Card
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF12172A),
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF7C5CFF).withOpacity(0.15),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                    border: Border.all(color: const Color(0xFF1F2937)),
                   ),
-                  const SizedBox(height: 20),
-
-                  // Staggered Grid
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildAnimatedMenu(
-                        index: 0,
-                        title: 'Absensi Hadir',
-                        subtitle: 'Check-in/out',
-                        icon: Icons.face_retouching_natural_rounded,
-                        color: Colors.indigoAccent,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AttendanceScreen(),
-                          ),
+                      const Text(
+                        '💰 Total Hari Ini',
+                        style: TextStyle(
+                          color: Color(0xFF9CA3AF),
+                          fontSize: 14,
                         ),
                       ),
-                      _buildAnimatedMenu(
-                        index: 1,
-                        title: 'Catat Jualan',
-                        subtitle: 'Input Pesanan',
-                        icon: Icons.point_of_sale_rounded,
-                        color: Colors.orangeAccent,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AddSaleScreen(),
-                          ),
-                        ),
-                      ),
-                      _buildAnimatedMenu(
-                        index: 2,
-                        title: 'Riwayat Penjualan',
-                        subtitle: 'Cek Penjualan',
-                        icon: Icons.auto_graph_rounded,
-                        color: Colors.tealAccent.shade700,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const SalesReportScreen(),
-                          ),
-                        ),
-                      ),
-                      _buildAnimatedMenu(
-                        index: 3,
-                        title: 'Pengaturan',
-                        subtitle: 'Kelola Profil',
-                        icon: Icons.tune_rounded,
-                        color: Colors.deepPurpleAccent,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ProfileScreen(),
-                          ),
+                      const SizedBox(height: 8),
+                      Text(
+                        NumberFormat.currency(
+                          locale: 'id_ID',
+                          symbol: 'Rp ',
+                          decimalDigits: 0,
+                        ).format(totalToday),
+                        style: const TextStyle(
+                          color: Color(0xFFE5E7EB),
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+
+                const SizedBox(height: 32),
+
+                const Text(
+                  'Menu Operasional',
+                  style: TextStyle(
+                    color: Color(0xFF9CA3AF),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Menu List
+                _buildMenuItem(
+                  title: 'Absensi Hadir',
+                  subtitle: 'Check-in & Check-out',
+                  icon: Icons.access_time_filled_rounded,
+                  color: const Color(0xFF7C5CFF),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AttendanceScreen()),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildMenuItem(
+                  title: 'Catat Penjualan',
+                  subtitle: 'Input pesanan baru',
+                  icon: Icons.calculate_rounded,
+                  color: const Color(0xFFF59E0B),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AddSaleScreen()),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildMenuItem(
+                  title: 'Riwayat Penjualan',
+                  subtitle: 'Lihat laporan transaksi',
+                  icon: Icons.bar_chart_rounded,
+                  color: const Color(0xFF22D3EE),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SalesReportScreen(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildMenuItem(
+                  title: 'Pengaturan',
+                  subtitle: 'Profil & Akun',
+                  icon: Icons.settings_rounded,
+                  color: const Color(0xFFEC4899),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildAnimatedMenu({
-    required int index,
+  Widget _buildMenuItem({
     required String title,
     required String subtitle,
     required IconData icon,
     required Color color,
     required VoidCallback onTap,
   }) {
-    final animation = CurvedAnimation(
-      parent: _staggeredController,
-      curve: Interval(
-        (index * 0.1).clamp(0, 1.0),
-        1.0,
-        curve: Curves.easeOutQuart,
-      ),
-    );
-
-    return ScaleTransition(
-      scale: animation,
-      child: FadeTransition(
-        opacity: animation,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(32),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: Colors.black.withOpacity(0.05)),
-              boxShadow: [
-                BoxShadow(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF12172A),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withOpacity(0.05)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Icon(icon, color: color, size: 32),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Color(0xFFE5E7EB),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF2C1B0E),
-                    fontSize: 13,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(color: Colors.grey, fontSize: 11),
-                ),
-              ],
-            ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: Color(0xFF4B5563)),
+            ],
           ),
         ),
       ),

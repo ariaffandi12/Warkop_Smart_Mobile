@@ -29,9 +29,16 @@ class MyApp extends StatelessWidget {
         title: 'Warkop Smart Manager',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF7C5CFF), // Purple Neon Accent
+            brightness: Brightness.dark,
+            primary: const Color(0xFF7C5CFF),
+            secondary: const Color(0xFF22D3EE),
+            surface: const Color(0xFF12172A),
+          ),
+          scaffoldBackgroundColor: const Color(0xFF0B0F1A),
           useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6B4226)),
-          textTheme: GoogleFonts.plusJakartaSansTextTheme(),
+          textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
         ),
         home: const SplashScreen(),
       ),

@@ -1,14 +1,19 @@
 import 'package:flutter/foundation.dart';
 
 class AppConstants {
-  // Use 10.0.2.2 for Android Emulator, or 127.0.0.1 for Web/Desktop
+  // Available modes: 'emulator', 'hp', 'web'
+  static const String mode = 'hp';
+
   static String get baseUrl {
-    if (kIsWeb) {
-      return "http://127.0.0.1/warkop_api";
-    } else if (defaultTargetPlatform == TargetPlatform.android) {
-      return "http://10.0.2.2/warkop_api";
-    } else {
-      return "http://127.0.0.1/warkop_api";
+    switch (mode) {
+      case 'hp':
+        return "http://10.212.99.253/warkop_api"; // HP Android real
+      case 'web':
+        return "http://127.0.0.1/warkop_api";
+      case 'emulator':
+      default:
+        // Fallback or default emulator address
+        return "http://10.0.2.2/warkop_api";
     }
   }
 

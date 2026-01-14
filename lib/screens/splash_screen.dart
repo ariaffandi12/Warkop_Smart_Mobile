@@ -96,11 +96,11 @@ class _SplashScreenState extends State<SplashScreen>
                 child: Container(
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Colors.white.withOpacity(0.1),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 40,
                         spreadRadius: 10,
                       ),
@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Text(
                     'E X E C U T I V E  S Y S T E M',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
+                      color: Colors.white.withOpacity(0.5),
                       fontSize: 10,
                       letterSpacing: 2,
                     ),

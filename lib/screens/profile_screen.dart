@@ -159,14 +159,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF6B4226),
-                        width: 2,
-                      ),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
                     child: CircleAvatar(
-                      radius: 60,
-                      backgroundColor: const Color(0xFF6B4226),
+                      radius: 65,
+                      backgroundColor: Colors.grey[200],
                       backgroundImage: _imageFile != null
                           ? FileImage(_imageFile!)
                           : (user != null && user.photo != null)
@@ -178,27 +182,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child:
                           (_imageFile == null &&
                               (user == null || user.photo == null))
-                          ? const Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.white,
+                          ? Icon(
+                              Icons.person_rounded,
+                              size: 65,
+                              color: Colors.grey[400],
                             )
                           : null,
                     ),
                   ),
                   Positioned(
                     bottom: 0,
-                    right: 0,
+                    right: 4,
                     child: GestureDetector(
                       onTap: _showImagePickerModal,
                       child: Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(12),
                         decoration: const BoxDecoration(
-                          color: Colors.green,
+                          color: Color(0xFF6B4226),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.camera_alt,
+                          Icons.camera_alt_rounded,
                           color: Colors.white,
                           size: 20,
                         ),
@@ -208,30 +212,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
 
             // Edit Name
             TextField(
               controller: _nameController,
+              style: const TextStyle(fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 labelText: 'Nama Lengkap',
+                labelStyle: TextStyle(color: Colors.grey[600]),
                 prefixIcon: const Icon(
-                  Icons.person_outline,
+                  Icons.person_outline_rounded,
                   color: Color(0xFF6B4226),
                 ),
+                filled: true,
+                fillColor: Colors.white,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                   borderSide: const BorderSide(
                     color: Color(0xFF6B4226),
                     width: 2,
                   ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
                 ),
               ),
             ),
@@ -247,7 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 16),
             _buildReadOnlyField(
               Icons.badge_outlined,
-              'Role',
+              'Peran', // Changed from Role to Peran (Indonesian)
               user?.role ?? '-',
             ),
 
@@ -256,18 +269,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             // Logout Button
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 56,
               child: ElevatedButton.icon(
                 onPressed: () {
                   showDialog(
                     context: context,
                     builder: (ctx) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       title: const Text('Konfirmasi Logout'),
-                      content: const Text('Apakah Anda yakin ingin keluar?'),
+                      content: const Text(
+                        'Apakah Anda yakin ingin keluar dari aplikasi?',
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Batal'),
+                          child: const Text(
+                            'Batal',
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ),
                         ElevatedButton(
                           onPressed: () {
@@ -285,6 +306,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
                             foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                           child: const Text('Ya, Keluar'),
                         ),
@@ -293,14 +317,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 },
                 icon: const Icon(Icons.logout_rounded),
-                label: const Text('Logout'),
+                label: const Text(
+                  'Keluar Aplikasi',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red[50],
+                  backgroundColor: const Color(0xFFFFEBEE),
                   foregroundColor: Colors.red,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.red.withOpacity(0.5)),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
@@ -315,13 +341,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF9F6),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: Colors.grey[600], size: 20),
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -331,9 +370,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   label,
                   style: TextStyle(color: Colors.grey[600], fontSize: 12),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF2D2D2D),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
