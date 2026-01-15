@@ -7,7 +7,6 @@ import '../../utils/constants.dart';
 import '../profile_screen.dart';
 import 'attendance_screen.dart';
 import 'add_sale_screen.dart';
-import '../auth/login_screen.dart';
 import '../owner/sales_report_screen.dart';
 
 class EmployeeDashboard extends StatefulWidget {
@@ -22,12 +21,14 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
   void initState() {
     super.initState();
     // Fetch today's sales report when dashboard loads
-    Future.microtask(
-      () => Provider.of<ReportProvider>(
-        context,
-        listen: false,
-      ).fetchSalesReport(type: 'today'),
-    );
+    Future.microtask(() {
+      if (mounted) {
+        Provider.of<ReportProvider>(
+          context,
+          listen: false,
+        ).fetchSalesReport(type: 'today');
+      }
+    });
   }
 
   @override
@@ -138,12 +139,14 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.15),
+                          color: AppColors.primary.withValues(alpha: 0.15),
                           blurRadius: 24,
                           offset: const Offset(0, 8),
                         ),
                       ],
-                      border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.05),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,14 +262,14 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
           decoration: BoxDecoration(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
