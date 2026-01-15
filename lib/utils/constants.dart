@@ -30,6 +30,8 @@ class AppConstants {
   // Attendance Endpoints
   static String get checkinUrl => "$baseUrl/attendance/checkin.php";
   static String get checkoutUrl => "$baseUrl/attendance/checkout.php";
+  static String get deleteAttendanceUrl =>
+      "$baseUrl/attendance/delete_attendance.php";
 
   // Sales Endpoints
   static String get addSaleUrl => "$baseUrl/sales/add_sale.php";

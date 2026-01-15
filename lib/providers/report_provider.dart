@@ -56,4 +56,31 @@ class ReportProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> deleteAttendanceRecord(int id) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await http.post(
+        Uri.parse(AppConstants.deleteAttendanceUrl),
+        body: json.encode({'id': id}),
+        headers: {'Content-Type': 'application/json'},
+      );
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        // Refresh the list after successful deletion
+        await fetchAttendanceReport();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error deleting attendance record: $e");
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
