@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../providers/report_provider.dart';
 import '../../utils/constants.dart';
+
+// Helper function to format rupiah with thousand separators
+String formatRupiah(dynamic value) {
+  final num amount = num.tryParse(value?.toString() ?? '0') ?? 0;
+  final formatter = NumberFormat('#,###', 'id_ID');
+  return 'Rp ${formatter.format(amount)}';
+}
 
 class SalesReportScreen extends StatefulWidget {
   const SalesReportScreen({super.key});
@@ -178,19 +186,32 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                           ),
                         ),
                         title: Text(
-                          'Rp ${sale['total_price']}',
+                          sale['product_name'] ?? sale['name'] ?? 'Produk',
                           style: const TextStyle(
                             color: AppColors.textPrimary,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        subtitle: Text(
-                          'Oleh: ${sale['karyawan_name']}',
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 12,
-                          ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              formatRupiah(sale['total_price']),
+                              style: TextStyle(
+                                color: AppColors.success,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              'Oleh: ${sale['karyawan_name'] ?? 'Unknown'}',
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ),
                         trailing: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -258,7 +279,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Rp ${provider.salesSummary?['total_income'] ?? 0}',
+            formatRupiah(provider.salesSummary?['total_income'] ?? 0),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 32,

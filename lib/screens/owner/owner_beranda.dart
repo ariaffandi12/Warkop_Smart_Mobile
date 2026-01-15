@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/report_provider.dart';
-import '../../providers/attendance_provider.dart';
 import '../../utils/constants.dart';
 import 'manage_products_screen.dart';
 import 'sales_report_screen.dart';
@@ -13,6 +13,13 @@ import 'owner_dashboard.dart';
 import 'edit_product_screen.dart';
 import '../profile_screen.dart';
 import '../auth/login_screen.dart';
+
+// Helper function to format rupiah with thousand separators
+String formatRupiah(dynamic value) {
+  final num amount = num.tryParse(value?.toString() ?? '0') ?? 0;
+  final formatter = NumberFormat('#,###', 'id_ID');
+  return 'Rp ${formatter.format(amount)}';
+}
 
 class OwnerBeranda extends StatefulWidget {
   const OwnerBeranda({super.key});
@@ -673,7 +680,7 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
                             ),
                           ),
                           Text(
-                            'Rp $totalPrice',
+                            formatRupiah(totalPrice),
                             style: TextStyle(
                               color: AppColors.success,
                               fontSize: 13,
