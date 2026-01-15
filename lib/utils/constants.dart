@@ -7,7 +7,7 @@ class AppConstants {
   static String get baseUrl {
     switch (mode) {
       case 'hp':
-        return "http://10.10.10.116/warkop_api"; // HP Android real with Port 8080
+        return "http://192.168.1.55/warkop_api"; // HP Android real with Port 8080
       case 'web':
         return "http://127.0.0.1/warkop_api";
       case 'emulator':

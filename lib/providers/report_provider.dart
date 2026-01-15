@@ -9,12 +9,24 @@ class ReportProvider with ChangeNotifier {
   List<dynamic> _recentSales = [];
   List<dynamic> _attendanceRecords = [];
   bool _isLoading = false;
+  String _currentFilterType = 'today'; // Track current filter
 
   Map<String, dynamic>? get salesSummary => _salesSummary;
   Map<String, dynamic>? get yesterdaySummary => _yesterdaySummary;
   List<dynamic> get recentSales => _recentSales;
   List<dynamic> get attendanceRecords => _attendanceRecords;
   bool get isLoading => _isLoading;
+  String get currentFilterType => _currentFilterType;
+
+  // Get filter label for display
+  String get filterLabel =>
+      _currentFilterType == 'today' ? 'Hari Ini' : 'Bulan Ini';
+
+  // Change filter and fetch new data
+  Future<void> changeFilter(String filterType) async {
+    _currentFilterType = filterType;
+    await fetchSalesReport(type: filterType);
+  }
 
   Future<void> fetchSalesReport({String type = 'today'}) async {
     _isLoading = true;

@@ -44,14 +44,13 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
     Future.microtask(() {
       if (!mounted) return;
       Provider.of<ProductProvider>(context, listen: false).fetchProducts();
-      Provider.of<ReportProvider>(
+      final reportProvider = Provider.of<ReportProvider>(
         context,
         listen: false,
-      ).fetchComparisonReport();
-      Provider.of<ReportProvider>(
-        context,
-        listen: false,
-      ).fetchAttendanceReport();
+      );
+      // Use the current filter type from provider (synced with Sales Report)
+      reportProvider.fetchSalesReport(type: reportProvider.currentFilterType);
+      reportProvider.fetchAttendanceReport();
     });
   }
 
@@ -77,6 +76,12 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
                     _buildStockAlertSection(),
                     const SizedBox(height: 24),
                     _buildInsightsSection(),
+                    const SizedBox(height: 24),
+                    _buildQuickStatsSection(),
+                    const SizedBox(height: 24),
+                    _buildRecentTransactionsSection(),
+                    const SizedBox(height: 24),
+                    _buildTipsCard(),
                     const SizedBox(height: 40),
                   ],
                 ),
@@ -356,6 +361,399 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
                   style: const TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Quick Stats Section - 3 cards in horizontal row
+  Widget _buildQuickStatsSection() {
+    return Consumer<ReportProvider>(
+      builder: (context, report, _) {
+        final summary = report.salesSummary;
+        final totalTransactions =
+            summary?['total_transactions']?.toString() ?? '0';
+
+        // Calculate total income from recentSales if salesSummary doesn't have it
+        num totalIncome = 0;
+        final summaryIncome = summary?['total_income'];
+        if (summaryIncome != null) {
+          totalIncome = num.tryParse(summaryIncome.toString()) ?? 0;
+        }
+
+        // If still 0, calculate from recentSales
+        if (totalIncome == 0 && report.recentSales.isNotEmpty) {
+          for (var sale in report.recentSales) {
+            totalIncome +=
+                num.tryParse(sale['total_price']?.toString() ?? '0') ?? 0;
+          }
+        }
+
+        // Format income for display
+        String formattedIncome = 'Rp 0';
+        if (totalIncome > 0) {
+          if (totalIncome >= 1000000) {
+            formattedIncome =
+                'Rp ${(totalIncome / 1000000).toStringAsFixed(1)}jt';
+          } else if (totalIncome >= 1000) {
+            formattedIncome = 'Rp ${(totalIncome / 1000).toStringAsFixed(0)}rb';
+          } else {
+            formattedIncome = 'Rp $totalIncome';
+          }
+        }
+
+        // Count products sold from recent sales
+        int productsSold = 0;
+        for (var sale in report.recentSales) {
+          productsSold +=
+              int.tryParse(sale['quantity']?.toString() ?? '1') ?? 1;
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'QUICK STATS',
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    report.filterLabel,
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.receipt_long_rounded,
+                    label: 'Total Transaksi',
+                    value: totalTransactions,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.payments_rounded,
+                    label: 'Pendapatan',
+                    value: formattedIncome,
+                    color: AppColors.success,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: _buildStatCard(
+                    icon: Icons.inventory_2_rounded,
+                    label: 'Produk Terjual',
+                    value: '$productsSold item',
+                    color: AppColors.warning,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 20),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Recent Transactions Section
+  Widget _buildRecentTransactionsSection() {
+    return Consumer<ReportProvider>(
+      builder: (context, report, _) {
+        final sales = report.recentSales.take(5).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Transaksi Terbaru',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SalesReportScreen(),
+                      ),
+                    );
+                    // No force refresh - let filter persist from Sales Report
+                  },
+                  child: Row(
+                    children: [
+                      Text(
+                        'Lihat Semua',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        color: AppColors.primary,
+                        size: 12,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            if (sales.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.receipt_long_outlined,
+                        color: AppColors.textMuted,
+                        size: 40,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Belum ada transaksi hari ini',
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: sales.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final sale = entry.value;
+                    final isLast = index == sales.length - 1;
+
+                    // Parse time from created_at
+                    String timeStr = '--:--';
+                    try {
+                      final dt = DateTime.parse(sale['created_at']);
+                      timeStr =
+                          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+                    } catch (_) {}
+
+                    final productName =
+                        sale['product_name'] ?? sale['name'] ?? 'Produk';
+                    final quantity = sale['quantity']?.toString() ?? '1';
+                    final totalPrice = sale['total_price']?.toString() ?? '0';
+
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        border: isLast
+                            ? null
+                            : const Border(
+                                bottom: BorderSide(color: Colors.white10),
+                              ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              timeStr,
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              '$productName x$quantity',
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            'Rp $totalPrice',
+                            style: TextStyle(
+                              color: AppColors.success,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Tips Card with rotating daily tips
+  Widget _buildTipsCard() {
+    // Get tip based on day of week for variety
+    final tips = [
+      'Selamat bekerja! Semangat mengelola usaha hari ini 💪',
+      'Pelanggan puas = Bisnis berkembang ☕',
+      'Menu favorit layak dipromosikan 🏆',
+      'Restock produk sebelum kehabisan 📦',
+      'Karyawan yang happy = Pelayanan terbaik 😊',
+      'Akhir minggu biasanya ramai, siapkan stok ekstra! 🚀',
+      'Evaluasi penjualan minggu ini untuk planning lebih baik 📊',
+    ];
+    final tipIndex = DateTime.now().weekday - 1;
+    final currentTip = tips[tipIndex % tips.length];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary.withValues(alpha: 0.15),
+            AppColors.secondary.withValues(alpha: 0.1),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.warning.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.lightbulb_rounded,
+              color: AppColors.warning,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Tips:',
+                  style: TextStyle(
+                    color: AppColors.warning,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  currentTip,
+                  style: const TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 13,
                   ),
                 ),
               ],

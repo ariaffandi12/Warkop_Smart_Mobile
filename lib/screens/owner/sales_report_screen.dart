@@ -11,21 +11,14 @@ class SalesReportScreen extends StatefulWidget {
 }
 
 class _SalesReportScreenState extends State<SalesReportScreen> {
-  String _filterType = 'today';
-
   @override
   void initState() {
     super.initState();
-    _fetchData();
-  }
-
-  void _fetchData() {
-    Future.microtask(
-      () => Provider.of<ReportProvider>(
-        context,
-        listen: false,
-      ).fetchSalesReport(type: _filterType),
-    );
+    // Fetch data with current filter type from provider
+    Future.microtask(() {
+      final provider = Provider.of<ReportProvider>(context, listen: false);
+      provider.fetchSalesReport(type: provider.currentFilterType);
+    });
   }
 
   @override
@@ -45,32 +38,63 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(
-              Icons.filter_list_rounded,
-              color: AppColors.textSecondary,
-            ),
-            color: AppColors.surface,
-            onSelected: (value) {
-              setState(() => _filterType = value);
-              _fetchData();
+          Consumer<ReportProvider>(
+            builder: (context, provider, _) {
+              return PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.filter_list_rounded,
+                  color: AppColors.textSecondary,
+                ),
+                color: AppColors.surface,
+                onSelected: (value) {
+                  provider.changeFilter(value);
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'today',
+                    child: Row(
+                      children: [
+                        Icon(
+                          provider.currentFilterType == 'today'
+                              ? Icons.check_circle
+                              : Icons.circle_outlined,
+                          color: provider.currentFilterType == 'today'
+                              ? AppColors.primary
+                              : AppColors.textMuted,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Hari Ini',
+                          style: TextStyle(color: AppColors.textPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'monthly',
+                    child: Row(
+                      children: [
+                        Icon(
+                          provider.currentFilterType == 'monthly'
+                              ? Icons.check_circle
+                              : Icons.circle_outlined,
+                          color: provider.currentFilterType == 'monthly'
+                              ? AppColors.primary
+                              : AppColors.textMuted,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          'Bulan Ini',
+                          style: TextStyle(color: AppColors.textPrimary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'today',
-                child: Text(
-                  'Hari Ini',
-                  style: TextStyle(color: AppColors.textPrimary),
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'monthly',
-                child: Text(
-                  'Bulan Ini',
-                  style: TextStyle(color: AppColors.textPrimary),
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -83,7 +107,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           }
 
           return RefreshIndicator(
-            onRefresh: () async => provider.fetchSalesReport(type: _filterType),
+            onRefresh: () async =>
+                provider.fetchSalesReport(type: provider.currentFilterType),
             color: AppColors.primary,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
