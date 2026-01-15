@@ -25,30 +25,31 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1B1B),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Log Kehadiran Karyawan',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
-        backgroundColor: const Color(0xFF1B1B1B),
+        backgroundColor: AppColors.background,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       body: Consumer<ReportProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading)
+          if (provider.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6B4226)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
+          }
 
           return RefreshIndicator(
             onRefresh: () => provider.fetchAttendanceReport(),
-            color: const Color(0xFF6B4226),
+            color: AppColors.primary,
             child: provider.attendanceRecords.isEmpty
                 ? const Center(
                     child: SingleChildScrollView(
@@ -58,7 +59,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
                         child: Center(
                           child: Text(
                             'Belum ada log kehadiran.',
-                            style: TextStyle(color: Colors.grey),
+                            style: TextStyle(color: AppColors.textMuted),
                           ),
                         ),
                       ),
@@ -84,9 +85,9 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF252525),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
       child: Column(
         children: [
@@ -95,12 +96,12 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: AppColors.primary.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.person_outline_rounded,
-                  color: Colors.amber,
+                  color: AppColors.primary,
                   size: 24,
                 ),
               ),
@@ -112,7 +113,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
                     Text(
                       log['karyawan_name'],
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -120,7 +121,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
                     Text(
                       log['check_in'].toString().split(' ')[0],
                       style: const TextStyle(
-                        color: Colors.white38,
+                        color: AppColors.textSecondary,
                         fontSize: 12,
                       ),
                     ),
@@ -134,16 +135,16 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
                 ),
                 decoration: BoxDecoration(
                   color: log['status'] == 'selesai'
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : Colors.orange.withValues(alpha: 0.1),
+                      ? AppColors.success.withOpacity(0.1)
+                      : AppColors.warning.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   log['status'] == 'selesai' ? 'SELESAI' : 'BEKERJA',
                   style: TextStyle(
                     color: log['status'] == 'selesai'
-                        ? Colors.green
-                        : Colors.orange,
+                        ? AppColors.success
+                        : AppColors.warning,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
@@ -152,7 +153,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          const Divider(color: Colors.white12),
+          Divider(color: Colors.white.withOpacity(0.1)),
           const SizedBox(height: 20),
           Row(
             children: [
@@ -181,7 +182,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
         Text(
           label,
           style: const TextStyle(
-            color: Colors.white38,
+            color: AppColors.textMuted,
             fontSize: 10,
             letterSpacing: 1,
             fontWeight: FontWeight.bold,
@@ -194,7 +195,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.white10,
+                color: AppColors.background,
                 borderRadius: BorderRadius.circular(12),
                 image: (photo != null && photo.isNotEmpty)
                     ? DecorationImage(
@@ -211,7 +212,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
               child: (photo == null || photo.isEmpty)
                   ? const Icon(
                       Icons.camera_alt_outlined,
-                      color: Colors.white24,
+                      color: AppColors.textMuted,
                       size: 20,
                     )
                   : null,
@@ -220,7 +221,7 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
             Text(
               time.substring(0, 5),
               style: const TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
               ),

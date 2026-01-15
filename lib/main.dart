@@ -7,6 +7,7 @@ import 'providers/product_provider.dart';
 import 'providers/sales_provider.dart';
 import 'providers/report_provider.dart';
 import 'screens/splash_screen.dart';
+import 'utils/constants.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,13 +31,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF7C5CFF), // Purple Neon Accent
+            seedColor: AppColors.primary,
             brightness: Brightness.dark,
-            primary: const Color(0xFF7C5CFF),
-            secondary: const Color(0xFF22D3EE),
-            surface: const Color(0xFF12172A),
+            primary: AppColors.primary,
+            secondary: AppColors.secondary,
+            surface: AppColors.surface,
           ),
-          scaffoldBackgroundColor: const Color(0xFF0B0F1A),
+          scaffoldBackgroundColor: AppColors.background,
           useMaterial3: true,
           textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
         ),

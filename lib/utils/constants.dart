@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class AppConstants {
   // Available modes: 'emulator', 'hp', 'web'
   static const String mode = 'hp';
@@ -45,4 +47,36 @@ class AppConstants {
       "$baseUrl/uploads/attendance/pulang/";
   static String get profileImagesUrl => "$baseUrl/uploads/profiles/";
   static String get updateProfileUrl => "$baseUrl/auth/update_profile.php";
+}
+
+class AppColors {
+  // Brand Colors (Fintech Dark Modern)
+  static const Color primary = Color(0xFF7C5CFF); // Deep Purple Neon
+  static const Color secondary = Color(0xFF22D3EE); // Cyan Neon
+  static const Color accent = Color(0xFFEC4899); // Pink Neon
+  static const Color success = Color(0xFF22C55E); // Green Neon
+  static const Color warning = Color(0xFFF59E0B); // Amber Neon
+  static const Color error = Color(0xFFEF4444); // Red Neon
+
+  // Background Colors
+  static const Color background = Color(0xFF0B0F1A);
+  static const Color surface = Color(0xFF12172A);
+  static const Color card = Color(0xFF171C34);
+  static const Color subCard = Color(0xFF1E293B);
+
+  // Text Colors
+  static const Color textPrimary = Color(0xFFF8FAFC);
+  static const Color textSecondary = Color(0xFF94A3B8);
+  static const Color textMuted = Color(0xFF64748B);
+
+  // Gradients
+  static const List<Color> mainGradient = [
+    Color(0xFF0B0F1A),
+    Color(0xFF171C34),
+  ];
+
+  static const List<Color> primaryGradient = [
+    Color(0xFF7C5CFF),
+    Color(0xFF5E36FF),
+  ];
 }

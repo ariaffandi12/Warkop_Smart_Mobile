@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/report_provider.dart';
+import '../../utils/constants.dart';
 
 class SalesReportScreen extends StatefulWidget {
   const SalesReportScreen({super.key});
@@ -30,43 +31,60 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1B1B),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Laporan Penjualan',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
-        backgroundColor: const Color(0xFF1B1B1B),
+        backgroundColor: AppColors.background,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list_rounded, color: Colors.white70),
+            icon: const Icon(
+              Icons.filter_list_rounded,
+              color: AppColors.textSecondary,
+            ),
+            color: AppColors.surface,
             onSelected: (value) {
               setState(() => _filterType = value);
               _fetchData();
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'today', child: Text('Hari Ini')),
-              const PopupMenuItem(value: 'monthly', child: Text('Bulan Ini')),
+              const PopupMenuItem(
+                value: 'today',
+                child: Text(
+                  'Hari Ini',
+                  style: TextStyle(color: AppColors.textPrimary),
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'monthly',
+                child: Text(
+                  'Bulan Ini',
+                  style: TextStyle(color: AppColors.textPrimary),
+                ),
+              ),
             ],
           ),
         ],
       ),
       body: Consumer<ReportProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading)
+          if (provider.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6B4226)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
+          }
 
           return RefreshIndicator(
             onRefresh: () async => provider.fetchSalesReport(type: _filterType),
-            color: const Color(0xFF6B4226),
+            color: AppColors.primary,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
@@ -77,14 +95,14 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                     children: [
                       Icon(
                         Icons.history_rounded,
-                        color: Colors.white38,
+                        color: AppColors.textMuted,
                         size: 16,
                       ),
                       SizedBox(width: 8),
                       Text(
                         'RIWAYAT TRANSAKSI',
                         style: TextStyle(
-                          color: Colors.white38,
+                          color: AppColors.textMuted,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 2,
@@ -99,7 +117,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                       padding: EdgeInsets.only(top: 40),
                       child: Text(
                         'Belum ada transaksi.',
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: AppColors.textMuted),
                       ),
                     ),
                   )
@@ -112,7 +130,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                         right: 16,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF252525),
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.05),
@@ -126,18 +144,18 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF6B4226).withOpacity(0.1),
+                            color: AppColors.primary.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
-                            Icons.receipt_rounded,
-                            color: Color(0xFF6B4226),
+                            Icons.receipt_long_rounded,
+                            color: AppColors.primary,
                           ),
                         ),
                         title: Text(
                           'Rp ${sale['total_price']}',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
@@ -145,7 +163,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                         subtitle: Text(
                           'Oleh: ${sale['karyawan_name']}',
                           style: const TextStyle(
-                            color: Colors.white38,
+                            color: AppColors.textSecondary,
                             fontSize: 12,
                           ),
                         ),
@@ -159,14 +177,14 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                                   .split(' ')[1]
                                   .substring(0, 5),
                               style: const TextStyle(
-                                color: Colors.white70,
+                                color: AppColors.textPrimary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               sale['created_at'].toString().split(' ')[0],
                               style: const TextStyle(
-                                color: Colors.white24,
+                                color: AppColors.textMuted,
                                 fontSize: 10,
                               ),
                             ),
@@ -189,19 +207,15 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
       margin: const EdgeInsets.all(24),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF2C1B0E),
-            const Color(0xFF1B1B1B).withOpacity(0.8),
-          ],
+        gradient: const LinearGradient(
+          colors: [AppColors.primary, Color(0xFF5E36FF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.white12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black38,
+            color: AppColors.primary.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -212,7 +226,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           const Text(
             'Total Pendapatan',
             style: TextStyle(
-              color: Colors.white38,
+              color: Colors.white70,
               fontSize: 12,
               letterSpacing: 1,
             ),
@@ -227,7 +241,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Divider(color: Colors.white12),
+          Divider(color: Colors.white.withOpacity(0.2)),
           const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -257,7 +271,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         ),
         Text(
           label,
-          style: const TextStyle(color: Colors.white38, fontSize: 10),
+          style: const TextStyle(color: Colors.white70, fontSize: 10),
         ),
       ],
     );

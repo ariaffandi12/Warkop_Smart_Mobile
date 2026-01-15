@@ -26,24 +26,25 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F6),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         title: const Text(
           'Pilih Menu Warkop',
           style: TextStyle(
-            color: Color(0xFF2C1B0E),
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.w800,
           ),
         ),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
         actions: [_buildCartAction(context)],
       ),
       body: Consumer<ProductProvider>(
         builder: (context, productProvider, _) {
           if (productProvider.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6B4226)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
           }
 
@@ -52,15 +53,15 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.coffee_outlined,
                     size: 64,
-                    color: Colors.brown[200],
+                    color: AppColors.textMuted,
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     'Menu belum tersedia',
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: AppColors.textMuted),
                   ),
                 ],
               ),
@@ -89,11 +90,12 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
   Widget _buildProductCard(BuildContext context, dynamic product) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -108,9 +110,9 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                 // Product Image
                 Container(
                   width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEFEBE9),
-                    borderRadius: const BorderRadius.vertical(
+                  decoration: const BoxDecoration(
+                    color: Colors.white10,
+                    borderRadius: BorderRadius.vertical(
                       top: Radius.circular(28),
                     ),
                   ),
@@ -126,16 +128,16 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                               AppConstants.productImagesUrl + product.imageUrl!,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => const Icon(
-                                Icons.coffee,
+                                Icons.coffee_rounded,
                                 size: 40,
-                                color: Colors.brown,
+                                color: AppColors.textMuted,
                               ),
                             ),
                           )
                         : const Icon(
-                            Icons.coffee,
+                            Icons.coffee_rounded,
                             size: 40,
-                            color: Colors.brown,
+                            color: AppColors.textMuted,
                           ),
                   ),
                 ),
@@ -149,7 +151,7 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: AppColors.background.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -157,7 +159,9 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: product.stock > 0 ? Colors.green : Colors.red,
+                        color: product.stock > 0
+                            ? AppColors.success
+                            : AppColors.error,
                       ),
                     ),
                   ),
@@ -177,9 +181,10 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 15,
+                    color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -190,8 +195,9 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                         decimalDigits: 0,
                       ).format(product.price),
                       style: const TextStyle(
-                        color: Color(0xFF6B4226),
+                        color: AppColors.secondary,
                         fontWeight: FontWeight.bold,
+                        fontSize: 13,
                       ),
                     ),
                     GestureDetector(
@@ -209,11 +215,15 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                                 context,
                               ).hideCurrentSnackBar();
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Ditambahkan!'),
-                                  duration: Duration(milliseconds: 500),
+                                SnackBar(
+                                  content: const Text('🛒 Menu ditambahkan!'),
+                                  duration: const Duration(milliseconds: 800),
                                   behavior: SnackBarBehavior.floating,
-                                  width: 120,
+                                  backgroundColor: AppColors.primary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  width: 180,
                                 ),
                               );
                             }
@@ -222,12 +232,21 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: product.stock > 0
-                              ? const Color(0xFF6B4226)
-                              : Colors.grey,
+                              ? AppColors.primary
+                              : AppColors.surface,
                           shape: BoxShape.circle,
+                          boxShadow: product.stock > 0
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primary.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                              : null,
                         ),
                         child: const Icon(
-                          Icons.add,
+                          Icons.add_rounded,
                           color: Colors.white,
                           size: 18,
                         ),
@@ -253,7 +272,7 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
             IconButton(
               icon: const Icon(
                 Icons.shopping_bag_outlined,
-                color: Color(0xFF2C1B0E),
+                color: AppColors.textPrimary,
               ),
               onPressed: () => Navigator.push(
                 context,
@@ -267,7 +286,7 @@ class _AddSaleScreenState extends State<AddSaleScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: const BoxDecoration(
-                    color: Colors.red,
+                    color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
                   constraints: const BoxConstraints(

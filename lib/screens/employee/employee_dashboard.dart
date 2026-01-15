@@ -54,14 +54,14 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0B0F1A), Color(0xFF171C34)],
+            colors: AppColors.mainGradient,
           ),
         ),
         child: SafeArea(
           child: RefreshIndicator(
             onRefresh: () async =>
                 reportProvider.fetchSalesReport(type: 'today'),
-            color: const Color(0xFF6B4226),
+            color: AppColors.primary,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(24),
@@ -78,9 +78,12 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                                 AppConstants.profileImagesUrl + user!.photo!,
                               )
                             : null,
-                        backgroundColor: const Color(0xFF1F2937),
+                        backgroundColor: AppColors.surface,
                         child: (user?.photo == null)
-                            ? const Icon(Icons.person, color: Color(0xFF9CA3AF))
+                            ? const Icon(
+                                Icons.person,
+                                color: AppColors.textSecondary,
+                              )
                             : null,
                       ),
                       const SizedBox(width: 16),
@@ -91,7 +94,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                             Text(
                               'Halo, ${user?.name ?? 'User'} 👋',
                               style: const TextStyle(
-                                color: Color(0xFFE5E7EB),
+                                color: AppColors.textPrimary,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -103,7 +106,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                                   width: 8,
                                   height: 8,
                                   decoration: const BoxDecoration(
-                                    color: Color(0xFF22C55E),
+                                    color: AppColors.success,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -111,7 +114,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                                 const Text(
                                   'Aktif Bekerja',
                                   style: TextStyle(
-                                    color: Color(0xFF22C55E),
+                                    color: AppColors.success,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -131,16 +134,16 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF12172A),
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF7C5CFF).withOpacity(0.15),
+                          color: AppColors.primary.withOpacity(0.15),
                           blurRadius: 24,
                           offset: const Offset(0, 8),
                         ),
                       ],
-                      border: Border.all(color: const Color(0xFF1F2937)),
+                      border: Border.all(color: Colors.white.withOpacity(0.05)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +151,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                         const Text(
                           '💰 Total Hari Ini',
                           style: TextStyle(
-                            color: Color(0xFF9CA3AF),
+                            color: AppColors.textSecondary,
                             fontSize: 14,
                           ),
                         ),
@@ -160,7 +163,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                             decimalDigits: 0,
                           ).format(totalToday),
                           style: const TextStyle(
-                            color: Color(0xFFE5E7EB),
+                            color: AppColors.textPrimary,
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
                           ),
@@ -174,7 +177,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                   const Text(
                     'Menu Operasional',
                     style: TextStyle(
-                      color: Color(0xFF9CA3AF),
+                      color: AppColors.textSecondary,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
@@ -187,7 +190,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                     title: 'Absensi Hadir',
                     subtitle: 'Check-in & Check-out',
                     icon: Icons.access_time_filled_rounded,
-                    color: const Color(0xFF7C5CFF),
+                    color: AppColors.primary,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -200,7 +203,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                     title: 'Catat Penjualan',
                     subtitle: 'Input pesanan baru',
                     icon: Icons.calculate_rounded,
-                    color: const Color(0xFFF59E0B),
+                    color: AppColors.warning,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const AddSaleScreen()),
@@ -211,7 +214,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                     title: 'Riwayat Penjualan',
                     subtitle: 'Lihat laporan transaksi',
                     icon: Icons.bar_chart_rounded,
-                    color: const Color(0xFF22D3EE),
+                    color: AppColors.secondary,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -224,7 +227,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                     title: 'Pengaturan',
                     subtitle: 'Profil & Akun',
                     icon: Icons.settings_rounded,
-                    color: const Color(0xFFEC4899),
+                    color: AppColors.accent,
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const ProfileScreen()),
@@ -254,7 +257,7 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF12172A),
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.white.withOpacity(0.05)),
           ),

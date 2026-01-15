@@ -60,113 +60,168 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Edit Produk')),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text(
+          'Edit Produk',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    backgroundColor: const Color(0xFF252525),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                    ),
-                    builder: (ctx) => Container(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(
-                              Icons.camera_alt,
-                              color: Colors.white,
-                            ),
-                            title: const Text(
-                              'Kamera',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onTap: () {
-                              Navigator.pop(ctx);
-                              _pickImage(ImageSource.camera);
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(
-                              Icons.photo_library,
-                              color: Colors.white,
-                            ),
-                            title: const Text(
-                              'Galeri',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onTap: () {
-                              Navigator.pop(ctx);
-                              _pickImage(ImageSource.gallery);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: _image != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.file(_image!, fit: BoxFit.cover),
-                        )
-                      : (widget.product.imageUrl != null)
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(
-                            AppConstants.productImagesUrl +
-                                widget.product.imageUrl!,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : const Icon(
-                          Icons.add_a_photo,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                ),
-              ),
-              const SizedBox(height: 8),
               const Text(
-                'Ketuk gambar untuk mengubah',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-              const SizedBox(height: 32),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama Produk',
-                  border: OutlineInputBorder(),
+                'FOTO PRODUK',
+                style: TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
                 ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: GestureDetector(
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: AppColors.surface,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(32),
+                        ),
+                      ),
+                      builder: (ctx) => Container(
+                        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 4,
+                              margin: const EdgeInsets.only(bottom: 24),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                            const Text(
+                              'Ganti Foto Produk',
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                _buildSourceOption(
+                                  ctx,
+                                  Icons.camera_alt_rounded,
+                                  'Kamera',
+                                  () {
+                                    Navigator.pop(ctx);
+                                    _pickImage(ImageSource.camera);
+                                  },
+                                ),
+                                _buildSourceOption(
+                                  ctx,
+                                  Icons.photo_library_rounded,
+                                  'Galeri',
+                                  () {
+                                    Navigator.pop(ctx);
+                                    _pickImage(ImageSource.gallery);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(32),
+                      border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: _image != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(32),
+                            child: Image.file(_image!, fit: BoxFit.cover),
+                          )
+                        : (widget.product.imageUrl != null)
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(32),
+                            child: Image.network(
+                              AppConstants.productImagesUrl +
+                                  widget.product.imageUrl!,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.add_a_photo_rounded,
+                            size: 48,
+                            color: AppColors.textMuted,
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Center(
+                child: Text(
+                  'Ketuk gambar untuk mengubah',
+                  style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              const Text(
+                'INFORMASI PRODUK',
+                style: TextStyle(
+                  color: AppColors.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildTextField(
+                controller: _nameController,
+                label: 'Nama Produk',
+                icon: Icons.coffee_rounded,
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Isi nama' : null,
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              _buildTextField(
                 controller: _priceController,
-                decoration: const InputDecoration(
-                  labelText: 'Harga (IDR)',
-                  border: OutlineInputBorder(),
-                ),
+                label: 'Harga (IDR)',
+                icon: Icons.payments_rounded,
                 keyboardType: TextInputType.number,
-                inputFormatters: [
+                formatters: [
                   FilteringTextInputFormatter.digitsOnly,
                   CurrencyInputFormatter(),
                 ],
@@ -174,28 +229,29 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     value == null || value.isEmpty ? 'Isi harga' : null,
               ),
               const SizedBox(height: 16),
-              TextFormField(
+              _buildTextField(
                 controller: _stockController,
-                decoration: const InputDecoration(
-                  labelText: 'Stok',
-                  border: OutlineInputBorder(),
-                ),
+                label: 'Stok',
+                icon: Icons.inventory_2_rounded,
                 keyboardType: TextInputType.number,
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Isi stok' : null,
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 48),
+
               Consumer<ProductProvider>(
                 builder: (context, provider, _) => SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: 64,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6B4226),
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                      elevation: 8,
+                      shadowColor: AppColors.primary.withOpacity(0.4),
                     ),
                     onPressed: provider.isLoading
                         ? null
@@ -216,15 +272,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                 Navigator.pop(context);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Produk berhasil diupdate'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              } else if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Gagal update produk'),
-                                    backgroundColor: Colors.red,
+                                    content: Text('✅ Produk berhasil diupdate'),
+                                    backgroundColor: AppColors.success,
+                                    behavior: SnackBarBehavior.floating,
                                   ),
                                 );
                               }
@@ -234,7 +284,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text(
                             'UPDATE PRODUK',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              letterSpacing: 1,
+                            ),
                           ),
                   ),
                 ),
@@ -242,6 +296,72 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+    List<TextInputFormatter>? formatters,
+    String? Function(String?)? validator,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        inputFormatters: formatters,
+        validator: validator,
+        style: const TextStyle(color: AppColors.textPrimary),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: AppColors.textMuted),
+          prefixIcon: Icon(icon, color: AppColors.primary, size: 20),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSourceOption(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withOpacity(0.05)),
+            ),
+            child: Icon(icon, color: AppColors.primary, size: 32),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -253,7 +373,7 @@ class CurrencyInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    if (newValue.selection.baseOffset == 0) {
+    if (newValue.text.isEmpty) {
       return newValue;
     }
 

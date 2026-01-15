@@ -25,26 +25,26 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1B1B),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Inventaris Produk',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 18,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
-        backgroundColor: const Color(0xFF1B1B1B),
+        backgroundColor: AppColors.background,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const AddProductScreen()),
         ),
-        backgroundColor: const Color(0xFF6B4226),
+        backgroundColor: AppColors.primary,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text(
           'TAMBAH PRODUK',
@@ -57,14 +57,15 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
       ),
       body: Consumer<ProductProvider>(
         builder: (context, provider, _) {
-          if (provider.isLoading)
+          if (provider.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF6B4226)),
+              child: CircularProgressIndicator(color: AppColors.primary),
             );
+          }
 
           return RefreshIndicator(
             onRefresh: () => provider.fetchProducts(),
-            color: const Color(0xFF6B4226),
+            color: AppColors.primary,
             child: ListView.builder(
               padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
               itemCount: provider.products.length,
@@ -73,11 +74,9 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF252525),
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.05),
-                    ),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
@@ -87,7 +86,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: Colors.white10,
+                          color: Colors.white.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(16),
                           image: product.imageUrl != null
                               ? DecorationImage(
@@ -100,14 +99,17 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                               : null,
                         ),
                         child: product.imageUrl == null
-                            ? const Icon(Icons.coffee, color: Colors.white24)
+                            ? const Icon(
+                                Icons.coffee_rounded,
+                                color: AppColors.textMuted,
+                              )
                             : null,
                       ),
                     ),
                     title: Text(
                       product.name,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -122,27 +124,25 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF6B4226,
-                              ).withValues(alpha: 0.2),
+                              color: AppColors.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               'Rp ${product.price}',
                               style: const TextStyle(
-                                color: Color(0xFFBC8F8F),
+                                color: AppColors.secondary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Text(
                             'Stok: ${product.stock}',
                             style: TextStyle(
                               color: product.stock < 10
-                                  ? Colors.redAccent
-                                  : Colors.white38,
+                                  ? AppColors.error
+                                  : AppColors.textMuted,
                               fontSize: 12,
                             ),
                           ),
@@ -155,7 +155,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                         IconButton(
                           icon: const Icon(
                             Icons.edit_rounded,
-                            color: Color(0xFFF59E0B),
+                            color: AppColors.warning,
                           ),
                           onPressed: () =>
                               Navigator.push(
@@ -175,7 +175,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                         IconButton(
                           icon: const Icon(
                             Icons.delete_rounded,
-                            color: Colors.redAccent,
+                            color: AppColors.error,
                           ),
                           onPressed: () =>
                               _showDeleteDialog(context, product.id, provider),
@@ -200,24 +200,30 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF252525),
+        backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text(
           'Hapus Produk?',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: const Text(
           'Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: AppColors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('BATAL', style: TextStyle(color: Colors.white54)),
+            child: const Text(
+              'BATAL',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
+              backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
             ),
             onPressed: () async {
@@ -231,7 +237,9 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                           ? 'Produk berhasil dihapus'
                           : 'Gagal menghapus produk',
                     ),
-                    backgroundColor: success ? Colors.green : Colors.redAccent,
+                    backgroundColor: success
+                        ? AppColors.success
+                        : AppColors.error,
                     behavior: SnackBarBehavior.floating,
                   ),
                 );

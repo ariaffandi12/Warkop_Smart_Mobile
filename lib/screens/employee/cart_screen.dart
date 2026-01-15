@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/sales_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../utils/constants.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -13,33 +14,36 @@ class CartScreen extends StatelessWidget {
     final userId = Provider.of<AuthProvider>(context, listen: false).user?.id;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAF9F6),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Pesanan Anda',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF2C1B0E),
+            color: AppColors.textPrimary,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF2C1B0E)),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       body: sales.cart.isEmpty
           ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.shopping_basket_outlined,
                     size: 80,
-                    color: Colors.brown[200],
+                    color: AppColors.textMuted,
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     'Keranjang masih kosong',
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
@@ -59,12 +63,12 @@ class CartScreen extends StatelessWidget {
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20),
                           decoration: BoxDecoration(
-                            color: Colors.redAccent,
+                            color: AppColors.error.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Icon(
                             Icons.delete_outline,
-                            color: Colors.white,
+                            color: AppColors.error,
                           ),
                         ),
                         onDismissed: (_) {
@@ -74,10 +78,10 @@ class CartScreen extends StatelessWidget {
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.surface,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.white.withOpacity(0.05),
                             ),
                           ),
                           child: Row(
@@ -85,12 +89,12 @@ class CartScreen extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF5E6DA),
+                                  color: AppColors.primary.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: const Icon(
-                                  Icons.coffee,
-                                  color: Color(0xFF6B4226),
+                                  Icons.coffee_rounded,
+                                  color: AppColors.primary,
                                 ),
                               ),
                               const SizedBox(width: 16),
@@ -103,12 +107,13 @@ class CartScreen extends StatelessWidget {
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
+                                        color: AppColors.textPrimary,
                                       ),
                                     ),
                                     Text(
                                       'Rp ${item.price} x ${item.quantity}',
                                       style: const TextStyle(
-                                        color: Colors.grey,
+                                        color: AppColors.textSecondary,
                                         fontSize: 13,
                                       ),
                                     ),
@@ -119,7 +124,7 @@ class CartScreen extends StatelessWidget {
                                 'Rp ${item.price * item.quantity}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF6B4226),
+                                  color: AppColors.secondary,
                                 ),
                               ),
                             ],
@@ -133,14 +138,14 @@ class CartScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.fromLTRB(24, 32, 24, 40),
                   decoration: const BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black12,
+                        color: Colors.black26,
                         blurRadius: 40,
                         offset: Offset(0, -10),
                       ),
@@ -153,14 +158,17 @@ class CartScreen extends StatelessWidget {
                         children: [
                           const Text(
                             'Total Pembayaran',
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 16,
+                            ),
                           ),
                           Text(
                             'Rp ${sales.totalAmount}',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
-                              color: Color(0xFF2C1B0E),
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ],
@@ -186,23 +194,21 @@ class CartScreen extends StatelessWidget {
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Transaksi Berhasil!'),
-                                        backgroundColor: Colors.green,
+                                        content: Text('🎉 Transaksi Berhasil!'),
+                                        backgroundColor: AppColors.success,
                                         behavior: SnackBarBehavior.floating,
                                       ),
                                     );
                                   }
                                 },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF6B4226),
+                            backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
                             elevation: 8,
-                            shadowColor: const Color(
-                              0xFF6B4226,
-                            ).withOpacity(0.4),
+                            shadowColor: AppColors.primary.withOpacity(0.4),
                           ),
                           child: sales.isLoading
                               ? const CircularProgressIndicator(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/report_provider.dart';
+import '../../utils/constants.dart';
 import 'manage_products_screen.dart';
 import 'sales_report_screen.dart';
 import 'attendance_report_screen.dart';
@@ -49,7 +50,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
     final user = Provider.of<AuthProvider>(context).user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1B1B1B), // Executive Dark
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -57,13 +58,13 @@ class _OwnerDashboardState extends State<OwnerDashboard>
             floating: false,
             pinned: true,
             elevation: 0,
-            backgroundColor: const Color(0xFF2C1B0E),
+            backgroundColor: AppColors.surface,
             centerTitle: true,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
                 'Warkop Analytics',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: AppColors.textPrimary.withValues(alpha: 0.9),
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   letterSpacing: 1.5,
@@ -74,7 +75,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0xFF3E2723), Color(0xFF1B1B1B)],
+                    colors: [AppColors.surface, AppColors.background],
                   ),
                 ),
                 child: Center(
@@ -86,7 +87,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                         backgroundColor: Colors.white12,
                         child: Icon(
                           Icons.admin_panel_settings_rounded,
-                          color: Colors.amber,
+                          color: AppColors.warning,
                           size: 45,
                         ),
                       ),
@@ -94,7 +95,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                       Text(
                         'Mr. ${user?.name ?? 'Owner'}',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -102,7 +103,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                       const Text(
                         'Authorized Personnel Only',
                         style: TextStyle(
-                          color: Colors.white38,
+                          color: AppColors.textMuted,
                           fontSize: 10,
                           letterSpacing: 2,
                         ),
@@ -114,7 +115,10 @@ class _OwnerDashboardState extends State<OwnerDashboard>
             ),
             actions: [
               IconButton(
-                icon: const Icon(Icons.logout_rounded, color: Colors.white70),
+                icon: const Icon(
+                  Icons.logout_rounded,
+                  color: AppColors.textSecondary,
+                ),
                 onPressed: () {
                   Provider.of<AuthProvider>(context, listen: false).logout();
                   Navigator.of(context).pushAndRemoveUntil(
@@ -140,7 +144,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                   const Text(
                     'CORE OPERATIONS',
                     style: TextStyle(
-                      color: Colors.white38,
+                      color: AppColors.textMuted,
                       fontSize: 11,
                       letterSpacing: 3,
                       fontWeight: FontWeight.w900,
@@ -165,14 +169,14 @@ class _OwnerDashboardState extends State<OwnerDashboard>
           padding: const EdgeInsets.all(28),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFF6B4226), Color(0xFF3E2723)],
+              colors: [AppColors.primary, Color(0xFF5E36FF)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(35),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
+                color: AppColors.primary.withOpacity(0.3),
                 blurRadius: 25,
                 offset: const Offset(0, 15),
               ),
@@ -185,7 +189,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                 children: [
                   const Icon(
                     Icons.analytics_outlined,
-                    color: Colors.amber,
+                    color: AppColors.warning,
                     size: 20,
                   ),
                   Container(
@@ -221,7 +225,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
               ),
               const Text(
                 'Gross Revenue Today',
-                style: TextStyle(color: Colors.white38, fontSize: 13),
+                style: TextStyle(color: Colors.white60, fontSize: 13),
               ),
               const SizedBox(height: 32),
               Row(
@@ -257,7 +261,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
         Text(
           label,
           style: const TextStyle(
-            color: Colors.white24,
+            color: Colors.white54,
             fontSize: 9,
             fontWeight: FontWeight.bold,
             letterSpacing: 1,
@@ -274,7 +278,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
           title: 'Inventaris Produk',
           subtitle: 'Update stok & daftar menu',
           icon: Icons.inventory_2_outlined,
-          color: Colors.indigoAccent,
+          color: AppColors.primary,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const ManageProductsScreen()),
@@ -285,7 +289,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
           title: 'Laporan Finansial',
           subtitle: 'Detail keuntungan harian',
           icon: Icons.payments_outlined,
-          color: Colors.amberAccent,
+          color: AppColors.warning,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const SalesReportScreen()),
@@ -296,7 +300,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
           title: 'Manajemen Tim',
           subtitle: 'Absensi & performa staf',
           icon: Icons.groups_2_outlined,
-          color: Colors.tealAccent.shade700,
+          color: AppColors.secondary,
           onTap: () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const AttendanceReportScreen()),
@@ -321,7 +325,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: const Color(0xFF252525),
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
@@ -343,7 +347,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                     Text(
                       title,
                       style: const TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -353,7 +357,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
                     Text(
                       subtitle,
                       style: const TextStyle(
-                        color: Colors.white38,
+                        color: AppColors.textSecondary,
                         fontSize: 12,
                       ),
                     ),
@@ -362,7 +366,7 @@ class _OwnerDashboardState extends State<OwnerDashboard>
               ),
               const Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: Colors.white12,
+                color: AppColors.textMuted,
                 size: 14,
               ),
             ],
