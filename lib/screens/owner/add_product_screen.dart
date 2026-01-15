@@ -199,7 +199,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _priceController,
-                label: 'Harga (IDR)',
+                label: ' (Harga IDR)',
                 icon: Icons.payments_rounded,
                 keyboardType: TextInputType.number,
                 formatters: [
@@ -207,7 +207,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   CurrencyInputFormatter(),
                 ],
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Isi harga' : null,
+                    value == null || value.isEmpty ? 'Isi ' : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -215,6 +215,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 label: 'Stok Awal',
                 icon: Icons.inventory_2_rounded,
                 keyboardType: TextInputType.number,
+                formatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) =>
                     value == null || value.isEmpty ? 'Isi stok' : null,
               ),

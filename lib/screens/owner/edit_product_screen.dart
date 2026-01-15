@@ -218,7 +218,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _priceController,
-                label: 'Harga (IDR)',
+                label: ' (Harga IDR)',
                 icon: Icons.payments_rounded,
                 keyboardType: TextInputType.number,
                 formatters: [
@@ -226,7 +226,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   CurrencyInputFormatter(),
                 ],
                 validator: (value) =>
-                    value == null || value.isEmpty ? 'Isi harga' : null,
+                    value == null || value.isEmpty ? 'Isi ' : null,
               ),
               const SizedBox(height: 16),
               _buildTextField(

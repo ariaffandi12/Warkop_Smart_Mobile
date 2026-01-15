@@ -5,11 +5,13 @@ import '../utils/constants.dart';
 
 class ReportProvider with ChangeNotifier {
   Map<String, dynamic>? _salesSummary;
+  Map<String, dynamic>? _yesterdaySummary;
   List<dynamic> _recentSales = [];
   List<dynamic> _attendanceRecords = [];
   bool _isLoading = false;
 
   Map<String, dynamic>? get salesSummary => _salesSummary;
+  Map<String, dynamic>? get yesterdaySummary => _yesterdaySummary;
   List<dynamic> get recentSales => _recentSales;
   List<dynamic> get attendanceRecords => _attendanceRecords;
   bool get isLoading => _isLoading;
@@ -25,8 +27,12 @@ class ReportProvider with ChangeNotifier {
       final data = json.decode(response.body);
 
       if (response.statusCode == 200 && data['status'] == 'success') {
-        _salesSummary = data['summary'];
-        _recentSales = data['data'];
+        if (type == 'yesterday') {
+          _yesterdaySummary = data['summary'];
+        } else {
+          _salesSummary = data['summary'];
+          _recentSales = data['data'];
+        }
       }
     } catch (e) {
       debugPrint("Error fetching sales report: $e");
@@ -34,6 +40,19 @@ class ReportProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> fetchComparisonReport() async {
+    _isLoading = true;
+    notifyListeners();
+
+    await Future.wait([
+      fetchSalesReport(type: 'today'),
+      fetchSalesReport(type: 'yesterday'),
+    ]);
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   Future<void> fetchAttendanceReport() async {

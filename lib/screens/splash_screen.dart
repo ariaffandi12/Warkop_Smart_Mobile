@@ -4,7 +4,7 @@ import '../providers/auth_provider.dart';
 import '../utils/constants.dart';
 import 'auth/login_screen.dart';
 import 'employee/employee_dashboard.dart';
-import 'owner/owner_dashboard.dart';
+import 'owner/owner_beranda.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (auth.user?.role == 'owner') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const OwnerDashboard()),
+          MaterialPageRoute(builder: (_) => const OwnerBeranda()),
         );
       } else {
         Navigator.pushReplacement(

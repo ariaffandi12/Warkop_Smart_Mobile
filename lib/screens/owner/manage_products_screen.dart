@@ -16,10 +16,10 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () =>
-          Provider.of<ProductProvider>(context, listen: false).fetchProducts(),
-    );
+    Future.microtask(() {
+      if (!mounted) return;
+      Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+    });
   }
 
   @override
@@ -76,7 +76,9 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.05),
+                    ),
                   ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
@@ -86,7 +88,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(16),
                           image: product.imageUrl != null
                               ? DecorationImage(
@@ -124,7 +126,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.1),
+                              color: AppColors.primary.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -157,20 +159,22 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                             Icons.edit_rounded,
                             color: AppColors.warning,
                           ),
-                          onPressed: () =>
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      EditProductScreen(product: product),
-                                ),
-                              ).then((_) {
-                                // Refresh list after returning from edit
-                                Provider.of<ProductProvider>(
-                                  context,
-                                  listen: false,
-                                ).fetchProducts();
-                              }),
+                          onPressed: () {
+                            final provider = Provider.of<ProductProvider>(
+                              context,
+                              listen: false,
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    EditProductScreen(product: product),
+                              ),
+                            ).then((_) {
+                              if (!mounted) return;
+                              provider.fetchProducts();
+                            });
+                          },
                         ),
                         IconButton(
                           icon: const Icon(
@@ -178,7 +182,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                             color: AppColors.error,
                           ),
                           onPressed: () =>
-                              _showDeleteDialog(context, product.id, provider),
+                              _showDeleteDialog(product.id, provider),
                         ),
                       ],
                     ),
@@ -192,11 +196,7 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
     );
   }
 
-  void _showDeleteDialog(
-    BuildContext context,
-    int id,
-    ProductProvider provider,
-  ) {
+  void _showDeleteDialog(int id, ProductProvider provider) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -229,21 +229,20 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               final success = await provider.deleteProduct(id);
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      success
-                          ? 'Produk berhasil dihapus'
-                          : 'Gagal menghapus produk',
-                    ),
-                    backgroundColor: success
-                        ? AppColors.success
-                        : AppColors.error,
-                    behavior: SnackBarBehavior.floating,
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    success
+                        ? 'Produk berhasil dihapus'
+                        : 'Gagal menghapus produk',
                   ),
-                );
-              }
+                  backgroundColor: success
+                      ? AppColors.success
+                      : AppColors.error,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
             },
             child: const Text('HAPUS'),
           ),

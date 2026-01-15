@@ -4,7 +4,7 @@ import 'dart:ui';
 import '../../providers/auth_provider.dart';
 import '../../utils/constants.dart';
 import '../employee/employee_dashboard.dart';
-import '../owner/owner_dashboard.dart';
+import '../owner/owner_beranda.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -70,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen>
       if (auth.user?.role == 'owner') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const OwnerDashboard()),
+          MaterialPageRoute(builder: (_) => const OwnerBeranda()),
         );
       } else {
         Navigator.pushReplacement(
