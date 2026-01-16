@@ -9,7 +9,7 @@ import '../../utils/constants.dart';
 import 'manage_products_screen.dart';
 import 'sales_report_screen.dart';
 import 'attendance_report_screen.dart';
-import 'owner_dashboard.dart';
+import 'analytics_dashboard_screen.dart';
 import 'edit_product_screen.dart';
 import '../profile_screen.dart';
 import '../auth/login_screen.dart';
@@ -794,7 +794,9 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const OwnerDashboard()),
+                      MaterialPageRoute(
+                        builder: (_) => const AnalyticsDashboardScreen(),
+                      ),
                     );
                   },
                 ),
