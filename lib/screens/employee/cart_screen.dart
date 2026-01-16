@@ -56,6 +56,20 @@ class CartScreen extends StatelessWidget {
                     itemCount: sales.cart.length,
                     itemBuilder: (context, index) {
                       final item = sales.cart[index];
+                      // Get product stock from ProductProvider
+                      final products = Provider.of<ProductProvider>(
+                        context,
+                      ).products;
+                      dynamic product;
+                      try {
+                        product = products.firstWhere(
+                          (p) => p.id == item.productId,
+                        );
+                      } catch (_) {
+                        product = null;
+                      }
+                      final maxStock = product?.stock ?? 999;
+
                       return Dismissible(
                         key: Key('cart_${item.productId}'),
                         direction: DismissDirection.endToStart,
@@ -97,7 +111,7 @@ class CartScreen extends StatelessWidget {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              const SizedBox(width: 16),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,25 +120,123 @@ class CartScreen extends StatelessWidget {
                                       item.productName,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
+                                    const SizedBox(height: 4),
                                     Text(
                                       'Rp ${item.price} x ${item.quantity}',
                                       style: const TextStyle(
                                         color: AppColors.textSecondary,
-                                        fontSize: 13,
+                                        fontSize: 12,
                                       ),
                                     ),
+                                    if (maxStock < 999)
+                                      Text(
+                                        'Stok tersedia: $maxStock',
+                                        style: const TextStyle(
+                                          color: AppColors.textMuted,
+                                          fontSize: 10,
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
+                              // Quantity Controls: - qty +
+                              Row(
+                                children: [
+                                  // Decrement button
+                                  GestureDetector(
+                                    onTap: () {
+                                      sales.decrementQuantity(item.productId);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.error.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Icon(
+                                        Icons.remove_rounded,
+                                        color: AppColors.error,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                  // Quantity display
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
+                                    ),
+                                    child: Text(
+                                      '${item.quantity}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  // Increment button
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (item.quantity < maxStock) {
+                                        sales.incrementQuantity(
+                                          item.productId,
+                                          maxStock: maxStock,
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).hideCurrentSnackBar();
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              '⚠️ Stok maksimal ${item.productName} adalah $maxStock!',
+                                            ),
+                                            backgroundColor: AppColors.error,
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: item.quantity < maxStock
+                                            ? AppColors.success.withOpacity(0.1)
+                                            : AppColors.textMuted.withOpacity(
+                                                0.1,
+                                              ),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Icon(
+                                        Icons.add_rounded,
+                                        color: item.quantity < maxStock
+                                            ? AppColors.success
+                                            : AppColors.textMuted,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 8),
+                              // Total price for this item
                               Text(
                                 'Rp ${item.price * item.quantity}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.secondary,
+                                  fontSize: 13,
                                 ),
                               ),
                             ],

@@ -30,16 +30,47 @@ class SalesProvider with ChangeNotifier {
   int get totalAmount =>
       _cart.fold(0, (sum, item) => sum + (item.price * item.quantity));
 
-  void addToCart(int productId, String name, int price) {
+  void addToCart(int productId, String name, int price, {int maxStock = 999}) {
     final index = _cart.indexWhere((item) => item.productId == productId);
     if (index != -1) {
-      _cart[index].quantity++;
+      // Check stock limit
+      if (_cart[index].quantity < maxStock) {
+        _cart[index].quantity++;
+      }
     } else {
       _cart.add(
         CartItem(productId: productId, productName: name, price: price),
       );
     }
     notifyListeners();
+  }
+
+  void incrementQuantity(int productId, {int maxStock = 999}) {
+    final index = _cart.indexWhere((item) => item.productId == productId);
+    if (index != -1 && _cart[index].quantity < maxStock) {
+      _cart[index].quantity++;
+      notifyListeners();
+    }
+  }
+
+  void decrementQuantity(int productId) {
+    final index = _cart.indexWhere((item) => item.productId == productId);
+    if (index != -1) {
+      if (_cart[index].quantity > 1) {
+        _cart[index].quantity--;
+      } else {
+        _cart.removeAt(index);
+      }
+      notifyListeners();
+    }
+  }
+
+  int getQuantityInCart(int productId) {
+    final index = _cart.indexWhere((item) => item.productId == productId);
+    if (index != -1) {
+      return _cart[index].quantity;
+    }
+    return 0;
   }
 
   void removeFromCart(int productId) {
