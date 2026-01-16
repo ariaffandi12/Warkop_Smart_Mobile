@@ -60,8 +60,9 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
         ),
         child: SafeArea(
           child: RefreshIndicator(
-            onRefresh: () async =>
-                reportProvider.fetchSalesReport(type: 'today'),
+            onRefresh: () async => reportProvider.fetchSalesReport(
+              type: reportProvider.currentFilterType,
+            ),
             color: AppColors.primary,
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -151,9 +152,9 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          '💰 Total Hari Ini',
-                          style: TextStyle(
+                        Text(
+                          '💰 Total ${reportProvider.filterLabel}',
+                          style: const TextStyle(
                             color: AppColors.textSecondary,
                             fontSize: 14,
                           ),

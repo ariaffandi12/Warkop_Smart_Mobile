@@ -19,8 +19,16 @@ class ReportProvider with ChangeNotifier {
   String get currentFilterType => _currentFilterType;
 
   // Get filter label for display
-  String get filterLabel =>
-      _currentFilterType == 'today' ? 'Hari Ini' : 'Bulan Ini';
+  String get filterLabel {
+    switch (_currentFilterType) {
+      case 'today':
+        return 'Hari Ini';
+      case 'monthly':
+        return 'Bulan Ini';
+      default:
+        return 'Hari Ini';
+    }
+  }
 
   // Change filter and fetch new data
   Future<void> changeFilter(String filterType) async {

@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../providers/sales_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../utils/constants.dart';
+
+// Helper untuk format Rupiah
+String formatRupiah(dynamic value) {
+  final num amount = num.tryParse(value?.toString() ?? '0') ?? 0;
+  final formatter = NumberFormat('#,###', 'id_ID');
+  return 'Rp ${formatter.format(amount)}';
+}
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -26,6 +34,22 @@ class CartScreen extends StatelessWidget {
         backgroundColor: AppColors.background,
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
+        actions: [
+          // Tombol Batalkan Semua
+          if (sales.cart.isNotEmpty)
+            TextButton.icon(
+              onPressed: () => _showCancelDialog(context, sales),
+              icon: const Icon(
+                Icons.delete_sweep_rounded,
+                color: AppColors.error,
+                size: 20,
+              ),
+              label: const Text(
+                'Batalkan',
+                style: TextStyle(color: AppColors.error, fontSize: 12),
+              ),
+            ),
+        ],
       ),
       body: sales.cart.isEmpty
           ? Center(
@@ -120,21 +144,21 @@ class CartScreen extends StatelessWidget {
                                       item.productName,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                        fontSize: 14,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: 2),
                                     Text(
-                                      'Rp ${item.price} x ${item.quantity}',
+                                      '${formatRupiah(item.price)} x ${item.quantity}',
                                       style: const TextStyle(
                                         color: AppColors.textSecondary,
-                                        fontSize: 12,
+                                        fontSize: 11,
                                       ),
                                     ),
                                     if (maxStock < 999)
                                       Text(
-                                        'Stok tersedia: $maxStock',
+                                        'Stok: $maxStock',
                                         style: const TextStyle(
                                           color: AppColors.textMuted,
                                           fontSize: 10,
@@ -145,6 +169,7 @@ class CartScreen extends StatelessWidget {
                               ),
                               // Quantity Controls: - qty +
                               Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   // Decrement button
                                   GestureDetector(
@@ -155,26 +180,26 @@ class CartScreen extends StatelessWidget {
                                       padding: const EdgeInsets.all(6),
                                       decoration: BoxDecoration(
                                         color: AppColors.error.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: const Icon(
                                         Icons.remove_rounded,
                                         color: AppColors.error,
-                                        size: 18,
+                                        size: 16,
                                       ),
                                     ),
                                   ),
                                   // Quantity display
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
+                                      horizontal: 10,
                                       vertical: 4,
                                     ),
                                     child: Text(
                                       '${item.quantity}',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        fontSize: 14,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
@@ -216,14 +241,14 @@ class CartScreen extends StatelessWidget {
                                             : AppColors.textMuted.withOpacity(
                                                 0.1,
                                               ),
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Icon(
                                         Icons.add_rounded,
                                         color: item.quantity < maxStock
                                             ? AppColors.success
                                             : AppColors.textMuted,
-                                        size: 18,
+                                        size: 16,
                                       ),
                                     ),
                                   ),
@@ -231,12 +256,16 @@ class CartScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 8),
                               // Total price for this item
-                              Text(
-                                'Rp ${item.price * item.quantity}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.secondary,
-                                  fontSize: 13,
+                              SizedBox(
+                                width: 80,
+                                child: Text(
+                                  formatRupiah(item.price * item.quantity),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.secondary,
+                                    fontSize: 12,
+                                  ),
+                                  textAlign: TextAlign.right,
                                 ),
                               ),
                             ],
@@ -248,7 +277,7 @@ class CartScreen extends StatelessWidget {
                 ),
                 // Premium Checkout Summary
                 Container(
-                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 40),
+                  padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
                   decoration: const BoxDecoration(
                     color: AppColors.surface,
                     borderRadius: BorderRadius.only(
@@ -265,82 +294,330 @@ class CartScreen extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
+                      // Order Summary
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Total Item',
+                                  style: TextStyle(
+                                    color: AppColors.textMuted,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                                Text(
+                                  '${sales.cart.fold<int>(0, (sum, item) => sum + item.quantity)} item',
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Total Pembayaran',
+                                  style: TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  formatRupiah(sales.totalAmount),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: AppColors.secondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Buttons Row
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Total Pembayaran',
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 16,
+                          // Batalkan Button
+                          Expanded(
+                            flex: 1,
+                            child: SizedBox(
+                              height: 56,
+                              child: OutlinedButton(
+                                onPressed: () =>
+                                    _showCancelDialog(context, sales),
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(
+                                    color: AppColors.error,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Text(
+                                  'BATALKAN',
+                                  style: TextStyle(
+                                    color: AppColors.error,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                          Text(
-                            'Rp ${sales.totalAmount}',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textPrimary,
+                          const SizedBox(width: 12),
+                          // Konfirmasi Button
+                          Expanded(
+                            flex: 2,
+                            child: SizedBox(
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: sales.isLoading
+                                    ? null
+                                    : () => _showConfirmDialog(
+                                        context,
+                                        sales,
+                                        userId!,
+                                      ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  elevation: 8,
+                                  shadowColor: AppColors.primary.withOpacity(
+                                    0.4,
+                                  ),
+                                ),
+                                child: sales.isLoading
+                                    ? const SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'KONFIRMASI',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                              ),
                             ),
                           ),
                         ],
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 64,
-                        child: ElevatedButton(
-                          onPressed: sales.isLoading
-                              ? null
-                              : () async {
-                                  final success = await sales.processSale(
-                                    userId!,
-                                  );
-                                  if (success && context.mounted) {
-                                    await Provider.of<ProductProvider>(
-                                      context,
-                                      listen: false,
-                                    ).fetchProducts();
-
-                                    if (!context.mounted) return;
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('🎉 Transaksi Berhasil!'),
-                                        backgroundColor: AppColors.success,
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  }
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            elevation: 8,
-                            shadowColor: AppColors.primary.withOpacity(0.4),
-                          ),
-                          child: sales.isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white,
-                                )
-                              : const Text(
-                                  'KONFIRMASI PESANAN',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                        ),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
+    );
+  }
+
+  // Dialog Konfirmasi Pesanan
+  void _showConfirmDialog(
+    BuildContext context,
+    SalesProvider sales,
+    int userId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Row(
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              color: AppColors.success,
+              size: 28,
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Konfirmasi Pesanan',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 18),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Apakah Anda yakin ingin memproses pesanan ini?',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Item:',
+                        style: TextStyle(color: AppColors.textMuted),
+                      ),
+                      Text(
+                        '${sales.cart.fold<int>(0, (sum, item) => sum + item.quantity)} item',
+                        style: const TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Bayar:',
+                        style: TextStyle(color: AppColors.textMuted),
+                      ),
+                      Text(
+                        formatRupiah(sales.totalAmount),
+                        style: const TextStyle(
+                          color: AppColors.secondary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final success = await sales.processSale(userId);
+              if (success && context.mounted) {
+                await Provider.of<ProductProvider>(
+                  context,
+                  listen: false,
+                ).fetchProducts();
+                if (!context.mounted) return;
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('🎉 Transaksi Berhasil!'),
+                    backgroundColor: AppColors.success,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.success,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Ya, Proses',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Dialog Batalkan Pesanan
+  void _showCancelDialog(BuildContext context, SalesProvider sales) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 28),
+            SizedBox(width: 12),
+            Text(
+              'Batalkan Pesanan',
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 18),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Apakah Anda yakin ingin membatalkan semua pesanan? Keranjang akan dikosongkan.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Tidak',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              sales.clearCart();
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('🗑️ Pesanan dibatalkan'),
+                  backgroundColor: AppColors.error,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Ya, Batalkan',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
