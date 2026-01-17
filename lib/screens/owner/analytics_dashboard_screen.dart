@@ -12,6 +12,7 @@ import 'sales_report_screen.dart';
 import 'attendance_report_screen.dart';
 import '../profile_screen.dart';
 import '../auth/login_screen.dart';
+import 'manage_employees_screen.dart';
 
 // Helper function to format rupiah
 String _formatRupiah(dynamic value) {

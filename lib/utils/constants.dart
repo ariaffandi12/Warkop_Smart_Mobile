@@ -1,19 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class AppConstants {
-  // Available modes: 'emulator', 'hp', 'web'
-  static const String mode = 'emulator';
+  // Base URLs untuk setiap platform
+  static const String _webUrl = "http://127.0.0.1/warkop_api";
+  static const String _emulatorUrl = "http://10.0.2.2/warkop_api";
+  static const String _hpUrl =
+      "http://10.212.228.65/warkop_api"; // Ganti IP sesuai WiFi buka cmd ipconfig get ipv4
 
+  // AUTO-DETECT PLATFORM 🚀
   static String get baseUrl {
-    switch (mode) {
-      case 'hp':
-        return "http://10.212.228.65/warkop_api";
-      case 'web':
-        return "http://127.0.0.1/warkop_api";
-      case 'emulator':
-      default:
-        // Fallback or default emulator address
-        return "http://10.0.2.2/warkop_api";
+    if (kIsWeb) {
+      // Running di browser
+      return _webUrl;
+    } else if (Platform.isAndroid) {
+      //catatan saya untuk hp real maka ubah aja ip nya manual karena tidak bisa auto detect ipconig
+      // Running di Android (emulator atau HP asli)
+      // Untuk HP asli, pastikan komputer & HP di WiFi yang sama
+      // dan ganti _hpUrl dengan IP komputer kamu
+      return _emulatorUrl; // Untuk emulator
+      // return _hpUrl; // Uncomment ini untuk HP asli
+    } else {
+      // iOS atau platform lain
+      return _webUrl;
     }
   }
 
