@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class AppConstants {
   // Available modes: 'emulator', 'hp', 'web'
-  static const String mode = 'hp';
+  static const String mode = 'emulator';
 
   static String get baseUrl {
     switch (mode) {
       case 'hp':
-        return "http://192.168.100.31/warkop_api"; // HP Android real with Port 8080
+        return "http://10.212.228.65/warkop_api";
       case 'web':
         return "http://127.0.0.1/warkop_api";
       case 'emulator':

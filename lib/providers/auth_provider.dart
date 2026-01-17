@@ -32,11 +32,24 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await http.post(
-        Uri.parse(AppConstants.loginUrl),
-        body: json.encode({'email': email, 'password': password}),
-        headers: {'Content-Type': 'application/json'},
-      );
+      debugPrint('🔐 Attempting login to: ${AppConstants.loginUrl}');
+
+      final response = await http
+          .post(
+            Uri.parse(AppConstants.loginUrl),
+            body: json.encode({'email': email, 'password': password}),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(
+            const Duration(seconds: 15),
+            onTimeout: () {
+              debugPrint('❌ Login request timeout after 15 seconds');
+              throw Exception('Connection timeout');
+            },
+          );
+
+      debugPrint('📡 Response status: ${response.statusCode}');
+      debugPrint('📦 Response body: ${response.body}');
 
       final data = json.decode(response.body);
 
@@ -48,13 +61,16 @@ class AuthProvider with ChangeNotifier {
 
         _isLoading = false;
         notifyListeners();
+        debugPrint('✅ Login successful');
         return true;
       } else {
+        debugPrint('❌ Login failed: ${data['message'] ?? 'Unknown error'}');
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
+      debugPrint('💥 Login error: $e');
       _isLoading = false;
       notifyListeners();
       return false;
