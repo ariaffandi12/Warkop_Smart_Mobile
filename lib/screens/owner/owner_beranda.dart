@@ -7,6 +7,7 @@ import '../../providers/product_provider.dart';
 import '../../providers/report_provider.dart';
 import '../../utils/constants.dart';
 import 'manage_products_screen.dart';
+import 'manage_employees_screen.dart';
 import 'sales_report_screen.dart';
 import 'attendance_report_screen.dart';
 import 'analytics_dashboard_screen.dart';
@@ -835,6 +836,19 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => const AttendanceReportScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.person_add_rounded,
+                  label: 'Kelola Karyawan',
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ManageEmployeesScreen(),
                       ),
                     );
                   },

@@ -7,6 +7,7 @@ import 'providers/attendance_provider.dart';
 import 'providers/product_provider.dart';
 import 'providers/sales_provider.dart';
 import 'providers/report_provider.dart';
+import 'providers/employee_provider.dart';
 import 'screens/splash_screen.dart';
 import 'utils/constants.dart';
 
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => SalesProvider()),
         ChangeNotifierProvider(create: (_) => ReportProvider()),
+        ChangeNotifierProvider(create: (_) => EmployeeProvider()),
       ],
       child: MaterialApp(
         title: 'Warkop Smart Manager',

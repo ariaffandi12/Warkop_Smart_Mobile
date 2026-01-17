@@ -19,6 +19,9 @@ class AppConstants {
 
   // Auth Endpoints
   static String get loginUrl => "$baseUrl/auth/login.php";
+  static String get getEmployeesUrl => "$baseUrl/auth/get_employees.php";
+  static String get registerEmployeeUrl => "$baseUrl/auth/register.php";
+  static String get updatePasswordUrl => "$baseUrl/auth/update_password.php";
 
   // Products Endpoints
   static String get getProductsUrl => "$baseUrl/products/get_products.php";
