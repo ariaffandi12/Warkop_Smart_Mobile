@@ -6,6 +6,7 @@ import '../../providers/report_provider.dart';
 import '../../utils/constants.dart';
 import '../profile_screen.dart';
 import 'attendance_screen.dart';
+import 'my_attendance_screen.dart';
 import 'add_sale_screen.dart';
 import '../owner/sales_report_screen.dart';
 
@@ -199,6 +200,19 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                       context,
                       MaterialPageRoute(
                         builder: (_) => const AttendanceScreen(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _buildMenuItem(
+                    title: 'Riwayat Absensi',
+                    subtitle: 'Lihat rekap kehadiran kamu',
+                    icon: Icons.history_rounded,
+                    color: AppColors.success,
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MyAttendanceScreen(),
                       ),
                     ),
                   ),

@@ -122,4 +122,86 @@ class ReportProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // Personal Attendance for Employee
+  List<dynamic> _personalAttendance = [];
+  Map<String, dynamic> _attendanceSummary = {};
+  String _selectedMonth = '';
+
+  List<dynamic> get personalAttendance => _personalAttendance;
+  Map<String, dynamic> get attendanceSummary => _attendanceSummary;
+  String get selectedMonth => _selectedMonth;
+
+  Future<void> fetchPersonalAttendance(String userName, {String? month}) async {
+    _isLoading = true;
+    if (month != null) _selectedMonth = month;
+    notifyListeners();
+
+    try {
+      final response = await http.get(
+        Uri.parse(AppConstants.attendanceReportUrl),
+      );
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        List<dynamic> allRecords = data['data'];
+
+        debugPrint('📊 Total records from API: ${allRecords.length}');
+        debugPrint('🔍 Looking for userName: $userName');
+
+        // Filter by karyawan_name (matching the logged-in user's name)
+        _personalAttendance = allRecords.where((record) {
+          String? recordName = record['karyawan_name']
+              ?.toString()
+              .toLowerCase();
+          return recordName == userName.toLowerCase();
+        }).toList();
+
+        debugPrint(
+          '✅ Filtered records for user: ${_personalAttendance.length}',
+        );
+
+        // Filter by month if specified
+        if (_selectedMonth.isNotEmpty) {
+          _personalAttendance = _personalAttendance.where((record) {
+            String checkIn = record['check_in'] ?? '';
+            return checkIn.startsWith(_selectedMonth);
+          }).toList();
+        }
+
+        // Calculate summary
+        int totalHadir = _personalAttendance.length;
+        int totalSelesai = _personalAttendance
+            .where((r) => r['status'] == 'selesai')
+            .length;
+
+        // Calculate average work hours
+        double totalHours = 0;
+        int countWithCheckout = 0;
+        for (var record in _personalAttendance) {
+          if (record['check_out'] != null) {
+            try {
+              DateTime checkIn = DateTime.parse(record['check_in']);
+              DateTime checkOut = DateTime.parse(record['check_out']);
+              totalHours += checkOut.difference(checkIn).inMinutes / 60;
+              countWithCheckout++;
+            } catch (_) {}
+          }
+        }
+
+        _attendanceSummary = {
+          'total_hadir': totalHadir,
+          'total_selesai': totalSelesai,
+          'rata_jam': countWithCheckout > 0
+              ? (totalHours / countWithCheckout)
+              : 0,
+        };
+      }
+    } catch (e) {
+      debugPrint("Error fetching personal attendance: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
