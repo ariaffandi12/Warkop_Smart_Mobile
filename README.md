@@ -1,4 +1,4 @@
-<img width="386" height="871" alt="image" src="https://github.com/user-attachments/assets/6e495d23-c6d5-4467-b1d0-3ed3028c61a5" /># ☕ Warkop Smart Management System
+# ☕ Warkop Smart Management System
 
 <p align="center">
   <img src="screenshots/logo.png" alt="Warkop Smart Logo" width="200"/>
@@ -60,8 +60,7 @@ Sistem absensi cerdas yang memastikan:
 - ✅ Popup notifikasi yang jelas jika mencoba absensi ulang
 
 <!-- Screenshot: Popup validasi absensi -->
-<img width="395" height="859" alt="image" src="https://github.com/user-attachments/assets/f00fff91-e9c3-48ef-8630-4f193a971ae1" />
-
+![Validasi Absensi](screenshots/attendance_validation.png)
 
 ### 2. Executive Dashboard
 Dashboard owner dengan:
@@ -241,59 +240,90 @@ return _hpUrl;
 
 ---
 
-## � Struktur Project
+## 📁 Struktur Project
 
 ```
 warkop_smart/
 ├── lib/
-│   ├── main.dart                 # Entry point aplikasi
-│   ├── models/                   # Data models
-│   │   ├── user.dart
-│   │   ├── product.dart
-│   │   └── sale.dart
-│   ├── providers/                # State management
-│   │   ├── auth_provider.dart
-│   │   ├── product_provider.dart
-│   │   ├── cart_provider.dart
-│   │   └── attendance_provider.dart
-│   ├── screens/                  # UI screens
-│   │   ├── auth/
-│   │   │   └── login_screen.dart
-│   │   ├── employee/
-│   │   │   ├── employee_beranda.dart
-│   │   │   ├── attendance_screen.dart
-│   │   │   └── pos_screen.dart
-│   │   └── owner/
-│   │       ├── owner_beranda.dart
-│   │       ├── manage_products_screen.dart
-│   │       └── sales_report_screen.dart
-│   ├── utils/
-│   │   └── constants.dart        # Konfigurasi API & tema
-│   └── widgets/                  # Reusable widgets
+│   ├── main.dart                       # Entry point aplikasi
+│   │
+│   ├── models/                         # Data models
+│   │   ├── product_model.dart          # Model produk
+│   │   └── user_model.dart             # Model user
+│   │
+│   ├── providers/                      # State management (Provider)
+│   │   ├── attendance_provider.dart    # Provider absensi
+│   │   ├── auth_provider.dart          # Provider autentikasi
+│   │   ├── employee_provider.dart      # Provider karyawan
+│   │   ├── product_provider.dart       # Provider produk
+│   │   ├── report_provider.dart        # Provider laporan
+│   │   └── sales_provider.dart         # Provider penjualan
+│   │
+│   ├── screens/                        # UI Screens
+│   │   ├── splash_screen.dart          # Splash screen
+│   │   ├── profile_screen.dart         # Halaman profil
+│   │   │
+│   │   ├── auth/                       # Autentikasi
+│   │   │   └── login_screen.dart       # Halaman login
+│   │   │
+│   │   ├── employee/                   # Screens karyawan
+│   │   │   ├── employee_dashboard.dart # Dashboard karyawan
+│   │   │   ├── attendance_screen.dart  # Absensi selfie
+│   │   │   ├── my_attendance_screen.dart # Riwayat absensi
+│   │   │   ├── add_sale_screen.dart    # POS - tambah transaksi
+│   │   │   └── cart_screen.dart        # Keranjang belanja
+│   │   │
+│   │   └── owner/                      # Screens owner
+│   │       ├── owner_beranda.dart      # Beranda owner
+│   │       ├── owner_dashboard.dart    # Dashboard analytics
+│   │       ├── analytics_dashboard_screen.dart # Analytics detail
+│   │       ├── manage_products_screen.dart     # Kelola produk
+│   │       ├── add_product_screen.dart         # Tambah produk
+│   │       ├── edit_product_screen.dart        # Edit produk
+│   │       ├── manage_employees_screen.dart    # Kelola karyawan
+│   │       ├── attendance_report_screen.dart   # Laporan absensi
+│   │       └── sales_report_screen.dart        # Laporan penjualan
+│   │
+│   └── utils/
+│       └── constants.dart              # Konfigurasi API & tema warna
 │
 warkop_api/
 ├── config/
-│   └── database.php              # Koneksi database
-├── auth/
-│   ├── login.php
-│   ├── register.php
-│   └── get_employees.php
-├── products/
-│   ├── get_products.php
-│   ├── add_product.php
-│   └── update_product.php
-├── attendance/
-│   ├── checkin.php               # Dengan validasi duplicate
-│   └── checkout.php              # Dengan validasi duplicate
-├── sales/
-│   └── add_sale.php
-├── reports/
-│   ├── sales_report.php
-│   └── attendance_report.php
-└── uploads/                      # Folder upload gambar
-    ├── products/
-    ├── attendance/
-    └── profiles/
+│   └── database.php                    # Koneksi database MySQL
+│
+├── auth/                               # Endpoint autentikasi
+│   ├── login.php                       # Login user
+│   ├── register.php                    # Register karyawan baru
+│   ├── get_employees.php               # Get daftar karyawan
+│   ├── delete_employee.php             # Hapus karyawan
+│   ├── update_password.php             # Update password
+│   └── update_profile.php              # Update profil
+│
+├── products/                           # Endpoint produk
+│   ├── get_products.php                # Get semua produk
+│   ├── add_product.php                 # Tambah produk
+│   ├── update_product.php              # Update produk
+│   ├── delete_product.php              # Hapus produk
+│   └── update_stock.php                # Update stok
+│
+├── attendance/                         # Endpoint absensi
+│   ├── checkin.php                     # Check-in (dengan validasi)
+│   ├── checkout.php                    # Check-out (dengan validasi)
+│   └── delete_attendance.php           # Hapus record absensi
+│
+├── sales/                              # Endpoint penjualan
+│   └── add_sale.php                    # Tambah transaksi
+│
+├── reports/                            # Endpoint laporan
+│   ├── sales_report.php                # Laporan penjualan
+│   └── attendance_report.php           # Laporan absensi
+│
+└── uploads/                            # Folder upload gambar
+    ├── products/                       # Foto produk
+    ├── attendance/                     # Foto absensi
+    │   ├── masuk/                      # Foto check-in
+    │   └── pulang/                     # Foto check-out
+    └── profiles/                       # Foto profil
 ```
 
 ---
