@@ -1,4 +1,4 @@
-# ☕ Warkop Smart Management System
+<img width="386" height="871" alt="image" src="https://github.com/user-attachments/assets/6e495d23-c6d5-4467-b1d0-3ed3028c61a5" /># ☕ Warkop Smart Management System
 
 <p align="center">
   <img src="screenshots/logo.png" alt="Warkop Smart Logo" width="200"/>
@@ -60,7 +60,8 @@ Sistem absensi cerdas yang memastikan:
 - ✅ Popup notifikasi yang jelas jika mencoba absensi ulang
 
 <!-- Screenshot: Popup validasi absensi -->
-![Validasi Absensi](screenshots/attendance_validation.png)
+![Validasi Absensi](<img width="395" height="859" alt="image" src="https://github.com/user-attachments/assets/eb37487f-2996-4ab2-852d-bfd58ece4e70" />
+)
 
 ### 2. Executive Dashboard
 Dashboard owner dengan:
