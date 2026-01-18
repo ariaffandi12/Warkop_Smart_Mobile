@@ -4,6 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../utils/constants.dart';
 
+class AttendanceResult {
+  final bool success;
+  final String message;
+  final String? errorCode;
+
+  AttendanceResult({
+    required this.success,
+    required this.message,
+    this.errorCode,
+  });
+}
+
 class AttendanceProvider with ChangeNotifier {
   bool _isLoading = false;
   Map<String, dynamic>? _todayAttendance;
@@ -11,7 +23,7 @@ class AttendanceProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   Map<String, dynamic>? get todayAttendance => _todayAttendance;
 
-  Future<bool> checkIn(int userId, File photo) async {
+  Future<AttendanceResult> checkIn(int userId, File photo) async {
     _isLoading = true;
     notifyListeners();
 
@@ -29,16 +41,27 @@ class AttendanceProvider with ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      return (response.statusCode == 201 || response.statusCode == 200) &&
-          data['status'] == 'success';
+
+      if (data['status'] == 'success') {
+        return AttendanceResult(
+          success: true,
+          message: data['message'] ?? 'Check-in berhasil!',
+        );
+      } else {
+        return AttendanceResult(
+          success: false,
+          message: data['message'] ?? 'Gagal check-in',
+          errorCode: data['error_code'],
+        );
+      }
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return false;
+      return AttendanceResult(success: false, message: 'Terjadi kesalahan: $e');
     }
   }
 
-  Future<bool> checkOut(int userId, File photo) async {
+  Future<AttendanceResult> checkOut(int userId, File photo) async {
     _isLoading = true;
     notifyListeners();
 
@@ -56,11 +79,23 @@ class AttendanceProvider with ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      return response.statusCode == 200 && data['status'] == 'success';
+
+      if (data['status'] == 'success') {
+        return AttendanceResult(
+          success: true,
+          message: data['message'] ?? 'Check-out berhasil!',
+        );
+      } else {
+        return AttendanceResult(
+          success: false,
+          message: data['message'] ?? 'Gagal check-out',
+          errorCode: data['error_code'],
+        );
+      }
     } catch (e) {
       _isLoading = false;
       notifyListeners();
-      return false;
+      return AttendanceResult(success: false, message: 'Terjadi kesalahan: $e');
     }
   }
 

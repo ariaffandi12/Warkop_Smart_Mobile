@@ -19,8 +19,8 @@ class AppConstants {
       // Running di Android (emulator atau HP asli)
       // Untuk HP asli, pastikan komputer & HP di WiFi yang sama
       // dan ganti _hpUrl dengan IP komputer kamu
-      return _emulatorUrl; // Untuk emulator
-      // return _hpUrl; // Uncomment ini untuk HP asli
+      // return _emulatorUrl; // Untuk emulator
+      return _hpUrl; // Untuk HP asli
     } else {
       // iOS atau platform lain
       return _webUrl;

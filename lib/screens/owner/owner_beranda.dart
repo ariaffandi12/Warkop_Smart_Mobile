@@ -31,6 +31,8 @@ class OwnerBeranda extends StatefulWidget {
 
 class _OwnerBerandaState extends State<OwnerBeranda> {
   Timer? _refreshTimer;
+  Timer? _clockTimer;
+  DateTime _currentTime = DateTime.now();
 
   @override
   void initState() {
@@ -40,11 +42,20 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
     _refreshTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       _refreshData();
     });
+    // Update clock every second for real-time display
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentTime = DateTime.now();
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _refreshTimer?.cancel();
+    _clockTimer?.cancel();
     super.dispose();
   }
 
@@ -102,65 +113,169 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
   }
 
   Widget _buildAppBar(dynamic user) {
+    // Time-based greeting using real-time updated _currentTime
+    final hour = _currentTime.hour;
+    String greeting;
+    IconData greetingIcon;
+    if (hour >= 5 && hour < 12) {
+      greeting = 'Selamat Pagi';
+      greetingIcon = Icons.wb_sunny_rounded;
+    } else if (hour >= 12 && hour < 15) {
+      greeting = 'Selamat Siang';
+      greetingIcon = Icons.wb_sunny_outlined;
+    } else if (hour >= 15 && hour < 18) {
+      greeting = 'Selamat Sore';
+      greetingIcon = Icons.wb_twilight_rounded;
+    } else {
+      greeting = 'Selamat Malam';
+      greetingIcon = Icons.nightlight_round;
+    }
+
     return SliverAppBar(
-      expandedHeight: 120,
+      expandedHeight: 140,
       floating: true,
       pinned: true,
       elevation: 0,
       backgroundColor: AppColors.background,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
-          padding: const EdgeInsets.fromLTRB(20, 60, 20, 0),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.primary.withOpacity(0.15),
+                AppColors.background,
+              ],
+            ),
+          ),
+          padding: const EdgeInsets.fromLTRB(20, 50, 20, 0),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Selamat Datang,',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 14,
+              // User Info Section
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Greeting with icon
+                    Row(
+                      children: [
+                        Icon(greetingIcon, color: AppColors.warning, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$greeting,',
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Text(
-                    user?.name ?? 'Owner',
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                    const SizedBox(height: 4),
+                    // User name with role badge
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            user?.name ?? 'Owner',
+                            style: const TextStyle(
+                              color: AppColors.textPrimary,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [AppColors.primary, AppColors.secondary],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            'OWNER',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 6),
+                    // Date display
+                    Text(
+                      _getFormattedDate(),
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const Spacer(),
+              // Profile Avatar Section
               GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const ProfileScreen()),
                 ),
                 child: Container(
-                  padding: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary, width: 2),
+                    gradient: LinearGradient(
+                      colors: [AppColors.primary, AppColors.secondary],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.3),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: AppColors.surface,
-                    backgroundImage:
-                        (user?.photo != null && user!.photo!.isNotEmpty)
-                        ? NetworkImage(
-                            AppConstants.profileImagesUrl + user!.photo!,
-                          )
-                        : null,
-                    onBackgroundImageError:
-                        (user?.photo != null && user!.photo!.isNotEmpty)
-                        ? (_, __) {}
-                        : null,
-                    child: (user?.photo == null || user!.photo!.isEmpty)
-                        ? const Icon(Icons.person, color: AppColors.primary)
-                        : null,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.background,
+                    ),
+                    child: CircleAvatar(
+                      radius: 24,
+                      backgroundColor: AppColors.surface,
+                      backgroundImage:
+                          (user?.photo != null && user!.photo!.isNotEmpty)
+                          ? NetworkImage(
+                              AppConstants.profileImagesUrl + user!.photo!,
+                            )
+                          : null,
+                      onBackgroundImageError:
+                          (user?.photo != null && user!.photo!.isNotEmpty)
+                          ? (_, __) {}
+                          : null,
+                      child: (user?.photo == null || user!.photo!.isEmpty)
+                          ? const Icon(
+                              Icons.person_rounded,
+                              color: AppColors.primary,
+                              size: 28,
+                            )
+                          : null,
+                    ),
                   ),
                 ),
               ),
@@ -169,6 +284,35 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
         ),
       ),
     );
+  }
+
+  String _getFormattedDate() {
+    final days = [
+      'Minggu',
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+    ];
+    final months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    final timeStr =
+        '${_currentTime.hour.toString().padLeft(2, '0')}:${_currentTime.minute.toString().padLeft(2, '0')}:${_currentTime.second.toString().padLeft(2, '0')}';
+    return '${days[_currentTime.weekday % 7]}, ${_currentTime.day} ${months[_currentTime.month - 1]} ${_currentTime.year} • $timeStr';
   }
 
   Widget _buildStockAlertSection() {

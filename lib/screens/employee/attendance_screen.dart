@@ -137,34 +137,78 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       final userId = Provider.of<AuthProvider>(context, listen: false).user!.id;
       final provider = Provider.of<AttendanceProvider>(context, listen: false);
 
-      bool success;
-      if (isCheckIn) {
-        success = await provider.checkIn(userId, _image!);
-      } else {
-        success = await provider.checkOut(userId, _image!);
-      }
+      final result = isCheckIn
+          ? await provider.checkIn(userId, _image!)
+          : await provider.checkOut(userId, _image!);
 
       if (!mounted) return;
 
-      if (success) {
+      if (result.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              isCheckIn ? 'Berhasil Check-in!' : 'Berhasil Check-out!',
-            ),
+            content: Text(result.message),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
           ),
         );
         Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Gagal melakukan absensi. Coba lagi.'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
+        // Tampilkan popup dialog untuk error
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: AppColors.surface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.warning_amber_rounded,
+                    color: AppColors.warning,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Perhatian',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              result.message,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 15,
+              ),
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('OK, Mengerti'),
+              ),
+            ],
           ),
         );
+        // Reset image agar bisa ambil foto ulang jika diperlukan
+        setState(() => _image = null);
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
