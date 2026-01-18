@@ -60,8 +60,8 @@ Sistem absensi cerdas yang memastikan:
 - ✅ Popup notifikasi yang jelas jika mencoba absensi ulang
 
 <!-- Screenshot: Popup validasi absensi -->
-![Validasi Absensi](<img width="395" height="859" alt="image" src="https://github.com/user-attachments/assets/eb37487f-2996-4ab2-852d-bfd58ece4e70" />
-)
+<img width="395" height="859" alt="image" src="https://github.com/user-attachments/assets/f00fff91-e9c3-48ef-8630-4f193a971ae1" />
+
 
 ### 2. Executive Dashboard
 Dashboard owner dengan:
