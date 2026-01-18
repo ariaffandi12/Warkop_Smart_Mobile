@@ -154,6 +154,10 @@ class _OwnerBerandaState extends State<OwnerBeranda> {
                             AppConstants.profileImagesUrl + user!.photo!,
                           )
                         : null,
+                    onBackgroundImageError:
+                        (user?.photo != null && user!.photo!.isNotEmpty)
+                        ? (_, __) {}
+                        : null,
                     child: (user?.photo == null || user!.photo!.isEmpty)
                         ? const Icon(Icons.person, color: AppColors.primary)
                         : null,

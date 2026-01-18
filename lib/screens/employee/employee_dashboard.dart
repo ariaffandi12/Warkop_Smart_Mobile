@@ -81,6 +81,9 @@ class _EmployeeDashboardState extends State<EmployeeDashboard> {
                                 AppConstants.profileImagesUrl + user!.photo!,
                               )
                             : null,
+                        onBackgroundImageError: (user?.photo != null)
+                            ? (_, __) {}
+                            : null,
                         backgroundColor: AppColors.surface,
                         child: (user?.photo == null)
                             ? const Icon(

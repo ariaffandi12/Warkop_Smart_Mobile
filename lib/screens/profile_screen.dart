@@ -190,6 +190,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 )
                                 as ImageProvider
                           : null,
+                      onBackgroundImageError:
+                          (_imageFile != null ||
+                              (user != null && user.photo != null))
+                          ? (_, __) {}
+                          : null,
                       child:
                           (_imageFile == null &&
                               (user == null || user.photo == null))

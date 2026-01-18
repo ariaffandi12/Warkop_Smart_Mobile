@@ -7,7 +7,7 @@ class AppConstants {
   static const String _webUrl = "http://127.0.0.1/warkop_api";
   static const String _emulatorUrl = "http://10.0.2.2/warkop_api";
   static const String _hpUrl =
-      "http://10.212.228.65/warkop_api"; // Ganti IP sesuai WiFi buka cmd ipconfig get ipv4
+      "http://10.10.10.217/warkop_api"; // Ganti IP sesuai WiFi buka cmd ipconfig get ipv4
 
   // AUTO-DETECT PLATFORM 🚀
   static String get baseUrl {

@@ -129,6 +129,10 @@ class _ManageEmployeesScreenState extends State<ManageEmployeesScreen> {
             backgroundImage: (photo != null && photo.toString().isNotEmpty)
                 ? NetworkImage(AppConstants.profileImagesUrl + photo)
                 : null,
+            onBackgroundImageError:
+                (photo != null && photo.toString().isNotEmpty)
+                ? (_, __) {}
+                : null,
             child: (photo == null || photo.toString().isEmpty)
                 ? const Icon(Icons.person, color: AppColors.primary, size: 28)
                 : null,

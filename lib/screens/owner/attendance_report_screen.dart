@@ -119,6 +119,11 @@ class _AttendanceReportScreenState extends State<AttendanceReportScreen> {
                           AppConstants.profileImagesUrl + log['karyawan_photo'],
                         )
                       : null,
+                  onBackgroundImageError:
+                      (log['karyawan_photo'] != null &&
+                          log['karyawan_photo'].toString().isNotEmpty)
+                      ? (_, __) {}
+                      : null,
                   child:
                       (log['karyawan_photo'] == null ||
                           log['karyawan_photo'].toString().isEmpty)
