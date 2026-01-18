@@ -179,6 +179,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
                               AppConstants.productImagesUrl +
                                   widget.product.imageUrl!,
                               fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primary,
+                                        strokeWidth: 2,
+                                      ),
+                                    );
+                                  },
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.image_not_supported_rounded,
+                                  size: 48,
+                                  color: AppColors.textMuted,
+                                );
+                              },
                             ),
                           )
                         : const Icon(

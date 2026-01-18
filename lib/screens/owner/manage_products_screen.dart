@@ -90,22 +90,28 @@ class _ManageProductsScreenState extends State<ManageProductsScreen> {
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(16),
-                          image: product.imageUrl != null
-                              ? DecorationImage(
-                                  image: NetworkImage(
-                                    AppConstants.productImagesUrl +
-                                        product.imageUrl!,
-                                  ),
-                                  fit: BoxFit.cover,
-                                )
-                              : null,
                         ),
-                        child: product.imageUrl == null
-                            ? const Icon(
+                        child: product.imageUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.network(
+                                  AppConstants.productImagesUrl +
+                                      product.imageUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 60,
+                                  height: 60,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.image_not_supported_rounded,
+                                      color: AppColors.textMuted,
+                                    );
+                                  },
+                                ),
+                              )
+                            : const Icon(
                                 Icons.coffee_rounded,
                                 color: AppColors.textMuted,
-                              )
-                            : null,
+                              ),
                       ),
                     ),
                     title: Text(
