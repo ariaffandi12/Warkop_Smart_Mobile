@@ -200,6 +200,8 @@ class _ManageEmployeesScreenState extends State<ManageEmployeesScreen> {
             onSelected: (value) {
               if (value == 'password') {
                 _showChangePasswordDialog(id, name);
+              } else if (value == 'delete') {
+                _showDeleteEmployeeDialog(id, name);
               }
             },
             itemBuilder: (context) => [
@@ -212,6 +214,23 @@ class _ManageEmployeesScreenState extends State<ManageEmployeesScreen> {
                     Text(
                       'Ubah Password',
                       style: TextStyle(color: AppColors.textPrimary),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.delete_rounded,
+                      color: AppColors.error,
+                      size: 20,
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      'Hapus Karyawan',
+                      style: TextStyle(color: AppColors.error),
                     ),
                   ],
                 ),
@@ -593,6 +612,117 @@ class _ManageEmployeesScreenState extends State<ManageEmployeesScreen> {
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: AppColors.primary.withOpacity(0.5)),
         ),
+      ),
+    );
+  }
+
+  void _showDeleteEmployeeDialog(int employeeId, String employeeName) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Hapus Karyawan?',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Apakah Anda yakin ingin menghapus akun:',
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.error.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.error.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.person_rounded,
+                    color: AppColors.error,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      employeeName,
+                      style: const TextStyle(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              '⚠️ Tindakan ini tidak dapat dibatalkan!',
+              style: TextStyle(
+                color: AppColors.warning,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Batal',
+              style: TextStyle(color: AppColors.textMuted),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+
+              final success = await Provider.of<EmployeeProvider>(
+                context,
+                listen: false,
+              ).deleteEmployee(employeeId: employeeId);
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Karyawan "$employeeName" berhasil dihapus'
+                          : 'Gagal menghapus karyawan',
+                    ),
+                    backgroundColor: success
+                        ? AppColors.success
+                        : AppColors.error,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Hapus'),
+          ),
+        ],
       ),
     );
   }

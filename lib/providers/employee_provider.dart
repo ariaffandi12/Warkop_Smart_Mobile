@@ -118,4 +118,42 @@ class EmployeeProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<bool> deleteEmployee({required int employeeId}) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      debugPrint('🗑️ Deleting employee ID: $employeeId');
+
+      final response = await http
+          .post(
+            Uri.parse(AppConstants.deleteEmployeeUrl),
+            body: json.encode({'user_id': employeeId}),
+            headers: {'Content-Type': 'application/json'},
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        debugPrint('✅ Employee deleted successfully');
+        // Remove from local list
+        _employees.removeWhere(
+          (emp) => emp['id'].toString() == employeeId.toString(),
+        );
+        notifyListeners();
+        return true;
+      } else {
+        debugPrint('❌ Delete failed: ${data['message']}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('💥 Error deleting employee: $e');
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }

@@ -32,6 +32,7 @@ class AppConstants {
   static String get getEmployeesUrl => "$baseUrl/auth/get_employees.php";
   static String get registerEmployeeUrl => "$baseUrl/auth/register.php";
   static String get updatePasswordUrl => "$baseUrl/auth/update_password.php";
+  static String get deleteEmployeeUrl => "$baseUrl/auth/delete_employee.php";
 
   // Products Endpoints
   static String get getProductsUrl => "$baseUrl/products/get_products.php";
