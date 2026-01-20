@@ -96,15 +96,18 @@ Sistem kasir dengan:
 ## 🛠️ Teknologi yang Digunakan
 
 ### Frontend (Mobile App)
-| Teknologi | Kegunaan |
-|-----------|----------|
-| **Flutter 3.x** | Framework UI cross-platform |
-| **Provider** | State management |
-| **Camera** | Fitur kamera untuk absensi |
-| **Image Picker** | Upload foto produk |
-| **FL Chart** | Grafik dan chart analytics |
-| **Google Fonts** | Typography premium |
-| **Intl** | Format tanggal & mata uang Indonesia |
+| Teknologi | Versi | Kegunaan |
+|-----------|-------|----------|
+| **Flutter** | SDK ^3.8.1 | Framework UI cross-platform |
+| **Provider** | ^6.1.2 | State management |
+| **Camera** | ^0.11.0+1 | Fitur kamera untuk absensi selfie |
+| **Image Picker** | ^1.1.2 | Upload foto produk dari galeri/kamera |
+| **FL Chart** | ^0.70.2 | Grafik dan chart analytics |
+| **Google Fonts** | ^6.2.1 | Typography premium |
+| **Intl** | ^0.19.0 | Format tanggal & mata uang Indonesia |
+| **Shared Preferences** | ^2.2.3 | Penyimpanan lokal untuk session |
+| **Path Provider** | ^2.1.3 | Akses path sistem file |
+| **HTTP** | ^1.2.1 | HTTP client untuk API calls |
 
 ### Backend (API)
 | Teknologi | Kegunaan |
@@ -186,7 +189,12 @@ cd Warkop_Smart_Mobile
 1. Buka **XAMPP Control Panel** dan aktifkan **Apache** serta **MySQL**
 2. Buka [localhost/phpmyadmin](http://localhost/phpmyadmin)
 3. Buat database baru dengan nama `warkop_db`
-4. Import file database yang berada di `/warkop_api/warkop_db.sql`
+4. Buat tabel-tabel berikut di database:
+   - `users` - Tabel pengguna (id, name, email, password, role, photo)
+   - `products` - Tabel produk (id, name, price, stock, category, image)
+   - `sales` - Tabel penjualan (id, user_id, total, date)
+   - `sale_items` - Tabel detail penjualan (id, sale_id, product_id, quantity, price)
+   - `attendance` - Tabel absensi (id, user_id, date, check_in, check_out, photo_in, photo_out)
 5. Copy folder `warkop_api` ke dalam direktori `htdocs` (contoh: `C:\xampp\htdocs\warkop_api`)
 
 ### 3. Setup Aplikasi (Frontend)
@@ -213,20 +221,32 @@ flutter build apk --release
 
 ## 🔧 Konfigurasi IP Address
 
-### Untuk Android Emulator
+Konfigurasi IP ada di file `lib/utils/constants.dart`:
+
 ```dart
 // lib/utils/constants.dart
-return _emulatorUrl; // http://10.0.2.2/warkop_api
+static const String _webUrl = "http://127.0.0.1/warkop_api";
+static const String _emulatorUrl = "http://10.0.2.2/warkop_api";
+static const String _hpUrl = "http://10.16.42.133/warkop_api"; // Ganti IP sesuai WiFi
+```
+
+### Untuk Android Emulator
+Gunakan `_emulatorUrl` (sudah ada default `10.0.2.2`):
+```dart
+return _emulatorUrl;
 ```
 
 ### Untuk HP Android Asli
 1. Pastikan HP dan Komputer di **WiFi yang sama**
 2. Buka CMD dan jalankan `ipconfig`
-3. Catat IPv4 Address (contoh: `192.168.1.100`)
-4. Update di `constants.dart`:
+3. Catat **IPv4 Address** (contoh: `192.168.1.100`)
+4. Update nilai `_hpUrl` di `constants.dart`:
 ```dart
 static const String _hpUrl = "http://192.168.1.100/warkop_api";
-return _hpUrl;
+```
+5. Pastikan return `_hpUrl` di fungsi `baseUrl`:
+```dart
+return _hpUrl; // Untuk HP asli
 ```
 
 ---
@@ -274,9 +294,9 @@ warkop_smart/
 │   │   │   └── cart_screen.dart        # Keranjang belanja
 │   │   │
 │   │   └── owner/                      # Screens owner
-│   │       ├── owner_beranda.dart      # Beranda owner
-│   │       ├── owner_dashboard.dart    # Dashboard analytics
-│   │       ├── analytics_dashboard_screen.dart # Analytics detail
+│   │       ├── owner_beranda.dart      # Beranda owner (navigasi utama)
+│   │       ├── owner_dashboard.dart    # Dashboard overview
+│   │       ├── analytics_dashboard_screen.dart # Analytics dengan grafik
 │   │       ├── manage_products_screen.dart     # Kelola produk
 │   │       ├── add_product_screen.dart         # Tambah produk
 │   │       ├── edit_product_screen.dart        # Edit produk
@@ -287,9 +307,13 @@ warkop_smart/
 │   └── utils/
 │       └── constants.dart              # Konfigurasi API & tema warna
 │
+├── pubspec.yaml                        # Konfigurasi dependencies Flutter
+│
 warkop_api/
 ├── config/
 │   └── database.php                    # Koneksi database MySQL
+│
+├── debug_path.php                      # Debug helper untuk path
 │
 ├── auth/                               # Endpoint autentikasi
 │   ├── login.php                       # Login user
@@ -307,15 +331,16 @@ warkop_api/
 │   └── update_stock.php                # Update stok
 │
 ├── attendance/                         # Endpoint absensi
-│   ├── checkin.php                     # Check-in (dengan validasi)
-│   ├── checkout.php                    # Check-out (dengan validasi)
-│   └── delete_attendance.php           # Hapus record absensi
+│   ├── checkin.php                     # Check-in (dengan validasi 1x/hari)
+│   ├── checkout.php                    # Check-out (dengan validasi 1x/hari)
+│   ├── delete_attendance.php           # Hapus record absensi
+│   └── debug_path.php                  # Debug helper untuk path gambar
 │
 ├── sales/                              # Endpoint penjualan
 │   └── add_sale.php                    # Tambah transaksi
 │
 ├── reports/                            # Endpoint laporan
-│   ├── sales_report.php                # Laporan penjualan
+│   ├── sales_report.php                # Laporan penjualan (filter harian/bulanan/karyawan)
 │   └── attendance_report.php           # Laporan absensi
 │
 └── uploads/                            # Folder upload gambar
