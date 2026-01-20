@@ -25,8 +25,92 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     // Fetch data with current filter type from provider
     Future.microtask(() {
       final provider = Provider.of<ReportProvider>(context, listen: false);
+      provider.fetchEmployees(); // Fetch employee list
       provider.fetchSalesReport(type: provider.currentFilterType);
     });
+  }
+
+  void _showEmployeeFilter(BuildContext context, ReportProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Filter Karyawan',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // All employees option
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: provider.selectedEmployeeId == null
+                      ? AppColors.primary
+                      : AppColors.subCard,
+                  child: const Icon(
+                    Icons.people,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
+                title: const Text(
+                  'Semua Karyawan',
+                  style: TextStyle(color: AppColors.textPrimary),
+                ),
+                trailing: provider.selectedEmployeeId == null
+                    ? const Icon(Icons.check_circle, color: AppColors.primary)
+                    : null,
+                onTap: () {
+                  provider.changeEmployeeFilter(null);
+                  Navigator.pop(context);
+                },
+              ),
+              const Divider(color: AppColors.subCard),
+              // Employee list
+              ...provider.employees.map((emp) {
+                final empId = int.tryParse(emp['id'].toString()) ?? 0;
+                final isSelected = provider.selectedEmployeeId == empId;
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: isSelected
+                        ? AppColors.primary
+                        : AppColors.subCard,
+                    child: Text(
+                      (emp['name'] ?? 'K')[0].toUpperCase(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  title: Text(
+                    emp['name'] ?? 'Unknown',
+                    style: const TextStyle(color: AppColors.textPrimary),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    provider.changeEmployeeFilter(empId);
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -46,6 +130,36 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: AppColors.textPrimary),
         actions: [
+          // Employee Filter Button
+          Consumer<ReportProvider>(
+            builder: (context, provider, _) {
+              return IconButton(
+                icon: Stack(
+                  children: [
+                    const Icon(
+                      Icons.person_search_rounded,
+                      color: AppColors.textSecondary,
+                    ),
+                    if (provider.selectedEmployeeId != null)
+                      Positioned(
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                onPressed: () => _showEmployeeFilter(context, provider),
+              );
+            },
+          ),
+          // Date Filter Button
           Consumer<ReportProvider>(
             builder: (context, provider, _) {
               return PopupMenuButton<String>(
@@ -121,6 +235,49 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
+                // Employee filter indicator
+                if (provider.selectedEmployeeId != null)
+                  Container(
+                    margin: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.3),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.person,
+                          color: AppColors.primary,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Filter: ${provider.selectedEmployeeName}',
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => provider.changeEmployeeFilter(null),
+                          child: const Icon(
+                            Icons.close,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 _buildAnalyticsSummary(provider),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(24, 24, 24, 12),

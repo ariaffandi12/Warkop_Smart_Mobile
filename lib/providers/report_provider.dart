@@ -11,12 +11,28 @@ class ReportProvider with ChangeNotifier {
   bool _isLoading = false;
   String _currentFilterType = 'today'; // Track current filter
 
+  // Employee filter state
+  List<dynamic> _employees = [];
+  int? _selectedEmployeeId;
+
   Map<String, dynamic>? get salesSummary => _salesSummary;
   Map<String, dynamic>? get yesterdaySummary => _yesterdaySummary;
   List<dynamic> get recentSales => _recentSales;
   List<dynamic> get attendanceRecords => _attendanceRecords;
   bool get isLoading => _isLoading;
   String get currentFilterType => _currentFilterType;
+
+  // Employee filter getters
+  List<dynamic> get employees => _employees;
+  int? get selectedEmployeeId => _selectedEmployeeId;
+  String get selectedEmployeeName {
+    if (_selectedEmployeeId == null) return 'Semua Karyawan';
+    final emp = _employees.firstWhere(
+      (e) => int.tryParse(e['id'].toString()) == _selectedEmployeeId,
+      orElse: () => null,
+    );
+    return emp?['name'] ?? 'Semua Karyawan';
+  }
 
   // Get filter label for display
   String get filterLabel {
@@ -30,6 +46,27 @@ class ReportProvider with ChangeNotifier {
     }
   }
 
+  // Fetch employees list
+  Future<void> fetchEmployees() async {
+    try {
+      final response = await http.get(Uri.parse(AppConstants.getEmployeesUrl));
+      final data = json.decode(response.body);
+
+      if (response.statusCode == 200 && data['status'] == 'success') {
+        _employees = data['data'];
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error fetching employees: $e");
+    }
+  }
+
+  // Change employee filter
+  Future<void> changeEmployeeFilter(int? employeeId) async {
+    _selectedEmployeeId = employeeId;
+    await fetchSalesReport(type: _currentFilterType);
+  }
+
   // Change filter and fetch new data
   Future<void> changeFilter(String filterType) async {
     _currentFilterType = filterType;
@@ -41,10 +78,18 @@ class ReportProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await http.get(
-        Uri.parse("${AppConstants.salesReportUrl}?type=$type"),
-      );
+      String url = "${AppConstants.salesReportUrl}?type=$type";
+      if (_selectedEmployeeId != null) {
+        url += "&employee_id=$_selectedEmployeeId";
+      }
+
+      debugPrint("🔍 Fetching sales report: $url");
+      debugPrint("🔍 Selected Employee ID: $_selectedEmployeeId");
+
+      final response = await http.get(Uri.parse(url));
       final data = json.decode(response.body);
+
+      debugPrint("🔍 API Debug: ${data['debug']}");
 
       if (response.statusCode == 200 && data['status'] == 'success') {
         if (type == 'yesterday') {
