@@ -256,7 +256,7 @@ return _hpUrl; // Untuk HP asli
 | Role | Email | Password |
 |------|-------|----------|
 | **👑 Owner** | `owner@warkop.com` | `password` |
-| **🧑‍🍳 Karyawan** | `karyawan1@warkop.com` | `password` |
+| **🧑‍🍳 Karyawan** | `` | `` |
 
 ---
 
